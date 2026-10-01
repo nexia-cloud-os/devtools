@@ -1,0 +1,22 @@
+
+// The business target may compose several models; this does not declare a Resource.
+export interface {{ PageName }}Input { title: string }
+export interface {{ PageName }}Record extends {{ PageName }}Input {
+    id: string;
+    actions: { update: boolean };
+}
+export const {{ pageCamel }}RecordRoute = (id: string) => `/apps/{{ appKey }}/{{ pageSlug }}/${encodeURIComponent(id)}`;
+const recordApi = (id: string) => `/{{ appKey }}/pages/{{ pageSlug }}/${encodeURIComponent(id)}`;
+export function {{ pageCamel }}RecordQueryOptions(tenantId: string, id: string) {
+    return queryOptions({
+        queryKey: ['{{ appKey }}', 'page', '{{ pageKey }}', tenantId, id],
+        queryFn: async ({ signal }): Promise<{{ PageName }}Record> => {
+            const { data } = await api.get<{{ PageName }}Record>(recordApi(id), { signal });
+            return data;
+        },
+    });
+}
+export async function save{{ PageName }}(id: string, input: {{ PageName }}Input): Promise<{{ PageName }}Record> {
+    const { data } = await api.put<{{ PageName }}Record>(recordApi(id), input);
+    return data;
+}

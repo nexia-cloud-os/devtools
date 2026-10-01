@@ -1,0 +1,17 @@
+import { useTranslation } from "react-i18next";
+import { AppRouteFrame } from "@nexia/sdk/host";
+
+/** Neutral landing page; published navigation owns the available pages. */
+export default function {{ appPrefix }}OverviewSurface() {
+    const { t } = useTranslation();
+
+    return (
+        <AppRouteFrame
+            appKey="{{ appKey }}"
+            title={t("{{ appKey }}.overview.title")}
+            subtitle={t("{{ appKey }}.overview.subtitle")}
+        >
+            <p>{t("{{ appKey }}.overview.empty.description")}</p>
+        </AppRouteFrame>
+    );
+}

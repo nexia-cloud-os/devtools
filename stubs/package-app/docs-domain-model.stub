@@ -1,0 +1,59 @@
+# {{ appTitle }} Domain Model
+
+> Design status: Not started. This document is the split-out home for the design
+> record's logical-model section. Record every logical model this App needs to
+> operate, not only models named by one current process.
+>
+> Keep the model order below unchanged. It is the canonical classification order
+> defined by the App model inventory contract (master and definition → policy and
+> configuration → operational → Core and cross-App references). Do not merge,
+> reorder, or rename these classes; add `### ModelName` blocks under the class a
+> model belongs to.
+
+## 1. Aggregate boundaries
+
+| Aggregate root | Owned logical children | Consistency boundary |
+| --- | --- | --- |
+
+## 2. Master and definition models
+
+Reusable business subjects, catalogs, classifications, codes, and versioned
+definitions.
+
+<!-- One `### ModelName` block per model: identity, ownership, and rules. -->
+
+## 3. Policy and configuration models
+
+Calculation, approval, allowance, default, calendar, template, mapping,
+numbering, and effectivity rules.
+
+<!-- One `### ModelName` block per model. -->
+
+## 4. Operational models
+
+Business cases, execution, results, histories, ledgers, balances, and
+state-changing records.
+
+<!-- One `### ModelName` block per model, each stating its lifecycle. -->
+
+## 5. Core and cross-App references
+
+Cross-App persistence is forbidden. Other-App references use Core
+ResourceReference, events, imported values, external identifiers, or frozen
+snapshots.
+
+| Workbook reference | Mode | Required behavior | Missing-App fallback | Frozen display evidence |
+| --- | --- | --- | --- | --- |
+
+## 6. Invariants
+
+<!-- Numbered business invariants this App guarantees. -->
+
+## Workbook reference identity index
+
+Machine-readable exact identity index for workbook section `④`. One row per owner
+App with its exact `AppName/Model` identities and the governing availability rule.
+Do not duplicate the fallback prose above.
+
+| Owner | Exact workbook model identities | Governing availability rule |
+| --- | --- | --- |

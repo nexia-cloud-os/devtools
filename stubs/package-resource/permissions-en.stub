@@ -1,0 +1,10 @@
+{
+    "permissions.keys.{{ appKey }}.{{ resourceLower }}.create.description": "Allows creating {{ resourcePluralTitle }}.",
+    "permissions.keys.{{ appKey }}.{{ resourceLower }}.create.label": "Create {{ resourcePluralTitle }}",
+    "permissions.keys.{{ appKey }}.{{ resourceLower }}.delete.description": "Allows deleting {{ resourcePluralTitle }}.",
+    "permissions.keys.{{ appKey }}.{{ resourceLower }}.delete.label": "Delete {{ resourcePluralTitle }}",
+    "permissions.keys.{{ appKey }}.{{ resourceLower }}.read.description": "Allows viewing {{ resourcePluralTitle }}.",
+    "permissions.keys.{{ appKey }}.{{ resourceLower }}.read.label": "View {{ resourcePluralTitle }}",
+    "permissions.keys.{{ appKey }}.{{ resourceLower }}.update.description": "Allows updating {{ resourcePluralTitle }}.",
+    "permissions.keys.{{ appKey }}.{{ resourceLower }}.update.label": "Update {{ resourcePluralTitle }}"
+}

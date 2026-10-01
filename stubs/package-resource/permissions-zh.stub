@@ -1,0 +1,10 @@
+{
+    "permissions.keys.{{ appKey }}.{{ resourceLower }}.create.description": "允许创建 {{ resourcePluralTitle }}。",
+    "permissions.keys.{{ appKey }}.{{ resourceLower }}.create.label": "创建 {{ resourcePluralTitle }}",
+    "permissions.keys.{{ appKey }}.{{ resourceLower }}.delete.description": "允许删除 {{ resourcePluralTitle }}。",
+    "permissions.keys.{{ appKey }}.{{ resourceLower }}.delete.label": "删除 {{ resourcePluralTitle }}",
+    "permissions.keys.{{ appKey }}.{{ resourceLower }}.read.description": "允许查看 {{ resourcePluralTitle }}。",
+    "permissions.keys.{{ appKey }}.{{ resourceLower }}.read.label": "查看 {{ resourcePluralTitle }}",
+    "permissions.keys.{{ appKey }}.{{ resourceLower }}.update.description": "允许更新 {{ resourcePluralTitle }}。",
+    "permissions.keys.{{ appKey }}.{{ resourceLower }}.update.label": "更新 {{ resourcePluralTitle }}"
+}

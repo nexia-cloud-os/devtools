@@ -1,0 +1,17 @@
+import { queryOptions } from '@tanstack/react-query';
+import { api } from '@nexia/sdk/host';
+
+// Replace this shape with the page-owned response, shared by its views.
+export interface {{ PageName }}Data {
+    items: ReadonlyArray<{ id: string; label: string }>;
+}
+
+export function {{ pageCamel }}QueryOptions(tenantId: string) {
+    return queryOptions({
+        queryKey: ['{{ appKey }}', 'page', '{{ pageKey }}', tenantId],
+        queryFn: async ({ signal }): Promise<{{ PageName }}Data> => {
+            const { data } = await api.get<{{ PageName }}Data>('/{{ appKey }}/pages/{{ pageSlug }}', { signal });
+            return data;
+        },
+    });
+}

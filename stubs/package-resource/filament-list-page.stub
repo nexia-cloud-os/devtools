@@ -1,0 +1,13 @@
+<?php
+
+declare(strict_types=1);
+
+namespace {{ packageNamespace }}\Filament\Tenant\Resources\{{ ResourcePluralStudly }}\Pages;
+
+use {{ packageNamespace }}\Filament\Tenant\Resources\{{ ResourcePluralStudly }}\{{ ResourceName }}Resource;
+use Filament\Resources\Pages\ListRecords;
+
+class List{{ ResourcePluralStudly }} extends ListRecords
+{
+    protected static string $resource = {{ ResourceName }}Resource::class;
+}

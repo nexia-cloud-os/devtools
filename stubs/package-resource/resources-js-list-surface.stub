@@ -1,0 +1,405 @@
+import { useCallback, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+    isHttpError,
+    type ResourceRef,
+    type ResourceListParams,
+    type AppRoutePrefetchContext,
+    type ResourceTableColumn,
+} from '@nexia/sdk';
+import {
+    ResourceTable,
+    ResourcePrimaryCell,
+    ResourceRowActionsMenu,
+    ResourceTextCell,
+    ResourceInspectorStackHost,
+    ResourceInspectorStackProvider,
+    keepPreviousResourceListData,
+    useResourceListParams,
+    WorkSurface,
+    WorkSection,
+    useContextQuery,
+    usePermissionsQuery,
+    api,
+    can,
+    useMessage,
+    useWorkSurfaceLabels,
+    useOpenResourceWorkTab,
+    useRegisterListLocateAction,
+    NxButton,
+    NxPageFrame,
+    NxEmptyView,
+    NxActionButton,
+    NxSearchField,
+} from '@nexia/sdk/host';
+import { NxOrganizationTargetSelector, useOrganizationTargetsQuery, useOrganizationListScope } from '@nexia/sdk/host';
+import {
+    type {{ ResourceName }}Record,
+    {{ resourceCamel }}ApiRoute,
+    {{ resourceCamel }}CreateRoute,
+    {{ resourceCamel }}ShowRoute,
+    {{ resourceCamel }}EditRoute,
+    {{ resourceCamel }}Permissions,
+    {{ resourceCamel }}ResourceActions,
+    {{ resourceCamel }}ResourceId,
+    {{ resourceCamel }}ResourceRef,
+} from '#app/resources/{{ resourcePluralKebab }}/{{ resourceKebab }}-resource-contract.ts';
+import { use{{ ResourceName }}Delete, {{ resourceCamel }}DetailQueryOptions, fetch{{ ResourceName }}List, {{ resourceCamel }}ListQueryScope, {{ resourceCamel }}ListQueryOptions } from '#app/resources/{{ resourcePluralKebab }}/{{ resourceKebab }}-queries.ts';
+
+export function prefetch(context: AppRoutePrefetchContext): void {
+    // Target availability is page-owned, never inferred from Shell state.
+    void context;
+}
+
+export default function {{ ResourceName }}ListSurface() {
+    const { t } = useTranslation();
+    const navigate = useNavigate();
+    const [selectedId, setSelectedId] = useState<string | null>(null);
+    const queryClient = useQueryClient();
+
+    const { data: context, isPending: contextPending, isError: contextError, error: contextFailure, refetch: refetchContext } = useContextQuery();
+    const tenantId = context?.tenant?.id;
+    const organizationScope = useOrganizationListScope(
+        tenantId,
+        {{ resourceCamel }}Permissions.read,
+        'legal-entity-list',
+        {{ legalEntityOwned }},
+    );
+    const { data: permissionData, isPending: permissionsPending, isError: permissionsError, error: permissionsFailure, refetch: refetchPermissions } = usePermissionsQuery(
+        tenantId,
+        null,
+    );
+    const permissions = permissionData?.permissions ?? [];
+    const createTargets = useOrganizationTargetsQuery(
+        tenantId,
+        {{ resourceCamel }}Permissions.create,
+        {},
+        {{ legalEntityOwned }} && !!tenantId,
+    );
+    const creatableLegalEntityPublicIds = useMemo(() => (createTargets.data?.data ?? [])
+        .filter((target) => target.operating_unit === null)
+        .map((target) => target.legal_entity.public_id), [createTargets.data]);
+    const legalEntityPublicIds = organizationScope.query.legalEntityPublicIds ?? [];
+    const canRead = {{ legalEntityOwned }}
+        ? organizationScope.canRead
+        : can(permissions, {{ resourceCamel }}Permissions.read);
+    const canCreateFallback = {{ legalEntityOwned }}
+        ? !createTargets.isPending && !createTargets.isError && creatableLegalEntityPublicIds.length > 0
+        : can(permissions, {{ resourceCamel }}Permissions.create);
+    const resourceContextId = {{ legalEntityOwned }} ? legalEntityPublicIds.join(',') : tenantId ?? null;
+    const { confirm } = useMessage();
+
+    const {
+        search,
+        setSearch,
+        sort,
+        setSort,
+        filters,
+        setFilters,
+        setParams,
+        page,
+        setPage,
+        perPage,
+        setPerPage,
+    } = useResourceListParams();
+
+    const listQueryScope = {{ resourceCamel }}ListQueryScope(
+        tenantId ?? '',
+        resourceContextId,
+    );
+    const listParams = { search, sort, filters, page, perPage };
+
+    const fetchList = useCallback(
+        (params: ResourceListParams, signal?: AbortSignal) => {
+            if (!canRead || ({{ legalEntityOwned }} && organizationScope.requestParams === undefined)) {
+                throw new Error('Organization scope is not readable.');
+            }
+            return fetch{{ ResourceName }}List(legalEntityPublicIds, params, signal);
+        },
+        [canRead, legalEntityPublicIds, organizationScope.requestParams],
+    );
+
+    const {
+        data: list,
+        isLoading,
+        isFetching,
+        isError,
+        error: listFailure,
+        refetch,
+    } = useQuery({
+        ...{{ resourceCamel }}ListQueryOptions(
+            tenantId ?? '',
+            legalEntityPublicIds,
+            listParams,
+        ),
+        placeholderData: keepPreviousResourceListData(listQueryScope),
+        queryFn: ({ signal }) => fetchList(listParams, signal),
+        enabled: !!tenantId && canRead && (!{{ legalEntityOwned }} || organizationScope.requestParams !== undefined),
+    });
+    const deleteResource = use{{ ResourceName }}Delete(tenantId ?? '');
+
+    const accessPending = !contextError && (contextPending || (!!tenantId && ({{ legalEntityOwned }} ? organizationScope.isLoading : permissionsPending)));
+    const listError = contextError || ({{ legalEntityOwned }} ? organizationScope.isError : permissionsError) || isError;
+    const failure = contextError ? contextFailure
+        : {{ legalEntityOwned }} && organizationScope.isError ? organizationScope.targets.error
+        : !{{ legalEntityOwned }} && permissionsError ? permissionsFailure : listFailure;
+    const failureStatus = isHttpError(failure) ? failure.response?.status : undefined;
+    const listReadable = !!tenantId && canRead && !accessPending && !listError;
+    const rows = listReadable ? list?.data ?? [] : [];
+    const meta = listReadable ? list?.meta : undefined;
+    const canCreate = (listReadable || (!!tenantId && !canRead && !accessPending && !listError))
+        && (meta?.actions.create ?? canCreateFallback);
+    const labels = useWorkSurfaceLabels({
+        action: 'list',
+        resourceLabel: t('{{ resource_key }}.list.title'),
+    });
+
+    useRegisterListLocateAction<{{ ResourceName }}Record>({
+        actionType: '{{ appKey }}.{{ resourceCamel }}.locate',
+        label: t('{{ resource_key }}.agent.locate.label'),
+        description: t('{{ resource_key }}.agent.locate.description'),
+        enabled: listReadable,
+        schema: meta?.list_schema,
+        params: { setParams, perPage },
+        fetchPage: async (listParams) => {
+            if (!canRead || ({{ legalEntityOwned }} && organizationScope.requestParams === undefined)) {
+                throw new Error('Organization scope is not readable.');
+            }
+            const result = await queryClient.fetchQuery({
+                queryKey: [
+                    ...listQueryScope,
+                    {
+                        search: listParams.search,
+                        sort: listParams.sort,
+                        filters: listParams.filters,
+                        page: listParams.page,
+                        perPage: listParams.perPage,
+                    },
+                ],
+                queryFn: ({ signal }) => fetchList(listParams, signal),
+            });
+            return { rows: result.data ?? [], total: result.meta?.total ?? null };
+        },
+        resolveRow: (row) => {
+            const id = {{ resourceCamel }}ResourceId(row);
+            return {
+                id,
+                label: row.name,
+                ...(row.actions.view
+                    ? { showUrl: {{ resourceCamel }}ShowRoute(id) }
+                    : {}),
+                ...(row.actions.update
+                    ? { editUrl: {{ resourceCamel }}EditRoute(id) }
+                    : {}),
+            };
+        },
+        onMatch: (row) => {
+            if (row.actions.view) {
+                setSelectedId({{ resourceCamel }}ResourceId(row));
+            }
+        },
+    });
+
+    const selected = useMemo(
+        () =>
+            selectedId
+                ? rows.find((row) => {{ resourceCamel }}ResourceId(row) === selectedId) ??
+                  null
+                : null,
+        [rows, selectedId],
+    );
+    const rootResource = selected?.actions.view
+        ? {{ resourceCamel }}ResourceRef(selected)
+        : null;
+    const openOrFocusResourceTab = useOpenResourceWorkTab('document');
+
+    function openResourceDetail(resource: ResourceRef) {
+        openOrFocusResourceTab(resource, {
+            route: resource.route ?? {{ resourceCamel }}ShowRoute(resource.id),
+        });
+    }
+
+    async function handleDelete(row: {{ ResourceName }}Record) {
+        if (!row.actions.delete) return;
+
+        const id = {{ resourceCamel }}ResourceId(row);
+        const ok = await confirm(
+            t('{{ resource_key }}.confirm_delete'),
+            {
+                confirmLabel: t('common.actions.delete'),
+                variant: 'destructive',
+            },
+        );
+        if (!ok) return;
+
+        deleteResource.mutate(id, {
+            onSuccess: () => {
+                if (selectedId === id) {
+                    setSelectedId(null);
+                }
+            },
+        });
+    }
+
+    const createRecord = () => navigate(creatableLegalEntityPublicIds.length === 1
+        ? {{ resourceCamel }}CreateRoute() + `?legal_entity_public_id=${encodeURIComponent(creatableLegalEntityPublicIds[0]!)}`
+        : {{ resourceCamel }}CreateRoute());
+    const selectRow = (row: {{ ResourceName }}Record) => {
+        if (row.actions.view) setSelectedId({{ resourceCamel }}ResourceId(row));
+    };
+    const columns: ResourceTableColumn<{{ ResourceName }}Record>[] = [
+        // `sortable` is a visual candidate. ResourceTable intersects it with
+        // the backend `meta.list_schema.sortable` catalog before activation.
+        {
+            key: 'name',
+            header: t('{{ resource_key }}.name.label'),
+            size: 'primary',
+            // This resource's own primary cell selects the row. Cross-resource
+            // reference cells must use ResourceLink without onActivate so they
+            // push that reference onto the Inspector stack instead.
+            cell: (row) =>
+                row.actions.view ? (
+                    <ResourcePrimaryCell
+                        resource={ {{ resourceCamel }}ResourceRef(row) }
+                        label={row.name}
+                        onActivate={() => selectRow(row)}
+                        testId={`{{ resourceKebab }}-link-${{{ resourceCamel }}ResourceId(row)}`}
+                    />
+                ) : (
+                    <ResourceTextCell primary={row.name} />
+                ),
+        },
+        {
+            key: 'actions',
+            header: t('common.actions.label'),
+            size: 'actions',
+            align: 'right',
+            cell: (row) => {
+                const items = {{ resourceCamel }}ResourceActions(row, t, {
+                    onDelete: () => void handleDelete(row),
+                    deleteDisabled: deleteResource.isPending,
+                    testIdPrefix: `{{ resourceKebab }}-actions-${{{ resourceCamel }}ResourceId(row)}`,
+                });
+
+                return items.length > 0 ? (
+                    <ResourceRowActionsMenu
+                        label={t('common.actions.label')}
+                        items={items}
+                        testId={`{{ resourceKebab }}-actions-${{{ resourceCamel }}ResourceId(row)}`}
+                    />
+                ) : null;
+            },
+        },
+    ];
+
+    return (
+        <NxPageFrame showHeader={false}
+            maxWidth="none"
+            organizationScope={{{ legalEntityOwned }} ? <NxOrganizationTargetSelector {...organizationScope.selectorProps} /> : null}
+            actions={
+                <>
+                    {canCreate ? (
+                        <NxActionButton
+                            kind="create"
+                            label={labels.createButtonLabel}
+                            onClick={createRecord}
+                            data-testid="{{ resourceKebab }}-create"
+                        />
+                    ) : null}
+                </>
+            }
+        >
+            {deleteResource.isError ? <NxEmptyView kind="error" /> : null}
+            <ResourceInspectorStackProvider
+                root={rootResource}
+                onOpenInTab={openResourceDetail}
+            >
+                <WorkSurface
+                    primaryLabel={t('{{ resource_key }}.list.title')}
+                    inspectorLabel={t('{{ resource_key }}.inspector.title')}
+                    resizeLabel={t('{{ resource_key }}.inspector.resize')}
+                    primary={
+                        <WorkSection
+                            layout="fullBleed"
+                            bodyClassName="overflow-hidden"
+                        >
+                            <ResourceTable
+                                tableId="{{ resource_key }}.list"
+                                label={t('{{ resource_key }}.list.title')}
+                                rows={rows}
+                                columns={columns}
+                                getKey={ {{ resourceCamel }}ResourceId }
+                                loading={isLoading}
+                                access={listError ? undefined : accessPending ? { state: 'pending' } : !canRead ? {
+                                    state: 'denied',
+                                    deniedTestId: '{{ resourceKebab }}-no-access',
+                                    deniedAction: <NxButton type="button" variant="primary" onClick={() => window.alert(t('common.actions.access_request_pending'))}>{t('common.actions.request_access')}</NxButton>,
+                                } : undefined}
+                                error={listError}
+                                errorDescription={failureStatus === 401 ? t('common.errors.unauthenticated')
+                                    : failureStatus === 403 ? t('common.status.no_access_description')
+                                    : failureStatus === 404 ? t('common.status.not_found_description') : undefined}
+                                onRetry={() => {
+                                    if (contextError) void refetchContext();
+                                    else if ({{ legalEntityOwned }} && organizationScope.isError) void organizationScope.targets.refetch();
+                                    else if (!{{ legalEntityOwned }} && permissionsError) void refetchPermissions();
+                                    else if (canRead) void refetch();
+                                }}
+                                hasActiveQuery={Boolean(search.trim())}
+                                emptyState={{
+                                    title: t('{{ resource_key }}.list.empty'),
+                                    action: canCreate ? <NxActionButton kind="create" label={labels.createButtonLabel} onClick={createRecord} /> : null,
+                                    testId: '{{ resourceKebab }}-empty',
+                                }}
+                                rowTestId={(row) => `{{ resourceKebab }}-row-${{{ resourceCamel }}ResourceId(row)}`}
+                                rowSelected={(row) => selectedId === {{ resourceCamel }}ResourceId(row)}
+                                onRowClick={selectRow}
+                                sort={sort}
+                                onSortChange={setSort}
+                                schema={meta?.list_schema}
+                                filters={filters}
+                                onFiltersChange={setFilters}
+                                transferMeta={meta?.resource_transfer}
+                                onTransferImported={() =>
+                                    queryClient.invalidateQueries({
+                                        queryKey: listQueryScope,
+                                    })
+                                }
+                                pagination={meta}
+                                onPageChange={setPage}
+                                onPerPageChange={setPerPage}
+                                paginationDisabled={isFetching}
+                                footer
+                                toolbar={{
+                                    leading: (
+                                        <NxSearchField
+                                            value={search}
+                                            onChange={setSearch}
+                                            placeholder={t('{{ resource_key }}.list.search.placeholder',
+                                            )}
+                                            aria-label={t('{{ resource_key }}.list.search.label',
+                                            )}
+                                            data-testid="{{ resourceKebab }}-search"
+                                        />
+                                    ),
+                                }}
+                            />
+                        </WorkSection>
+                    }
+                    inspector={
+                        <ResourceInspectorStackHost
+                            emptyState={
+                                <p className="text-xs text-text-tertiary">
+                                    {t('{{ resource_key }}.inspector.empty')}
+                                </p>
+                            }
+                            onClose={() => setSelectedId(null)}
+                        />
+                    }
+                />
+            </ResourceInspectorStackProvider>
+        </NxPageFrame>
+    );
+}

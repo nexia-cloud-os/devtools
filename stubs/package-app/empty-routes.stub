@@ -1,0 +1,16 @@
+<?php
+
+declare(strict_types=1);
+
+use Illuminate\Support\Facades\Route;
+use Nexia\Http\Middleware;
+// nexia:make-package-resource:controller-imports:end
+
+Route::middleware([
+    Middleware::APP_REQUEST,
+    'app.installed:{{ appKey }}',
+    Middleware::LEGAL_ENTITY_CONTEXT,
+    Middleware::WORKSPACE_CONTEXT,
+])->group(function () {
+    // nexia:make-package-resource:routes:end
+});

@@ -1,0 +1,74 @@
+import { useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
+import { isHttpError } from '@nexia/sdk';
+import {
+    NxPageFrame, NxButton, NxEmptyView, NxLoadingBlock, NxFormSection, NxFormField,
+    NxTextInput, NxDetailRow, NxSectionCard, useContextQuery, useMarkTabDirty, parseMutationFormError, firstFieldError,
+} from '@nexia/sdk/host';
+import {
+    {{ pageCamel }}RecordQueryOptions, {{ pageCamel }}RecordRoute, save{{ PageName }},
+    type {{ PageName }}Input, type {{ PageName }}Record,
+} from './{{ pageSlug }}-queries';
+
+function Editor({ record, tenantId }: { record: {{ PageName }}Record; tenantId: string }) {
+    const { t } = useTranslation();
+    const navigate = useNavigate();
+    const cache = useQueryClient();
+    const [title, setTitle] = useState(record.title);
+    const [baseline, setBaseline] = useState(record.title);
+    useMarkTabDirty(title !== baseline);
+    const save = useMutation({
+        mutationFn: (input: {{ PageName }}Input) => save{{ PageName }}(record.id, input),
+        onSuccess: (saved, submitted) => {
+            setBaseline(saved.title);
+            setTitle(current => current === submitted.title ? saved.title : current);
+            cache.setQueryData({{ pageCamel }}RecordQueryOptions(tenantId, record.id).queryKey, saved);
+            void cache.invalidateQueries({ queryKey: ['{{ appKey }}', 'page', '{{ pageKey }}', tenantId] });
+        },
+    });
+    const error = save.isError ? parseMutationFormError({ error: save.error, t, fallback: t('common.status.error'), fieldLabel: field => field === 'title' ? t('{{ appKey }}.pages.{{ pageKey }}.title') : field }) : null;
+    return <NxFormSection spacing="section"
+        binding={{ formKey: '{{ appKey }}.pages.{{ pageKey }}', scopeKey: JSON.stringify([tenantId, record.id]), effect: 'draft', disabled: save.isPending }}
+        onSubmit={event => { event.preventDefault(); if (!save.isPending) save.mutate({ title }); }}
+        error={error?.formError}
+        actions={<>
+            <NxButton type="button" disabled={save.isPending} onClick={() => {
+                navigate({{ pageCamel }}RecordRoute(record.id));
+            }}>{t('common.actions.cancel')}</NxButton>
+            <NxButton type="submit" disabled={save.isPending || title === baseline}>{t('common.actions.save')}</NxButton>
+        </>}>
+        <NxSectionCard title={t('{{ appKey }}.pages.{{ pageKey }}.sections.basics')}>
+        <NxFormField fieldKey="title" label={t('{{ appKey }}.pages.{{ pageKey }}.title')} required error={firstFieldError(error?.fieldErrors, 'title')}>
+            {slot => <NxTextInput id={slot.id} aria-describedby={slot.describedBy} invalid={slot.invalid} value={title} onValueChange={setTitle} required disabled={save.isPending} />}
+        </NxFormField>
+        </NxSectionCard>
+    </NxFormSection>;
+}
+
+export default function {{ PageName }}RecordSurface({ mode = 'read' }: { mode?: 'read' | 'edit' }) {
+    const { t } = useTranslation();
+    const navigate = useNavigate();
+    const { id } = useParams<{ id: string }>();
+    const { data: context } = useContextQuery();
+    const tenantId = context?.tenant?.id;
+    const query = useQuery({ ...{{ pageCamel }}RecordQueryOptions(tenantId ?? '', id ?? ''), enabled: !!tenantId && !!id });
+    const status = isHttpError(query.error) ? query.error.response?.status : undefined;
+    const record = query.data;
+    return <NxPageFrame currentLabel={t('{{ appKey }}.pages.{{ pageKey }}.title')}>
+        {!id ? <NxEmptyView kind="notFound" /> : !tenantId || query.isLoading ? <NxLoadingBlock shape="text" label={t('common.status.loading')} /> : query.isError && (!record || status === 401 || status === 403 || status === 404) ?
+            <NxEmptyView kind={status === 403 ? 'permission' : status === 404 ? 'notFound' : 'error'} description={status === 401 ? t('common.errors.unauthenticated') : undefined}>
+                {status !== 403 && status !== 404 ? <NxButton onClick={() => void query.refetch()}>{t('common.actions.retry')}</NxButton> : null}
+            </NxEmptyView> : !record ? <NxEmptyView kind="notFound" /> : <>
+                {query.isError ? <NxEmptyView kind="error"><NxButton onClick={() => void query.refetch()}>{t('common.actions.retry')}</NxButton></NxEmptyView> : null}
+                {mode === 'edit' ?
+                record.actions.update ? <Editor key={JSON.stringify([tenantId, id])} record={record} tenantId={tenantId!} /> : <NxEmptyView kind="permission" /> : <>
+                    <NxSectionCard title={t('{{ appKey }}.pages.{{ pageKey }}.sections.basics')} layout="rows"
+                        actions={record.actions.update ? <NxButton onClick={() => navigate(`${{{ pageCamel }}RecordRoute(record.id)}/edit`)}>{t('common.actions.edit')}</NxButton> : undefined}>
+                        <NxDetailRow label={t('{{ appKey }}.pages.{{ pageKey }}.title')}>{record.title}</NxDetailRow>
+                    </NxSectionCard>
+                </>}
+            </>}
+    </NxPageFrame>;
+}

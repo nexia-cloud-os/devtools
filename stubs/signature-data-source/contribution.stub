@@ -1,0 +1,62 @@
+<?php
+
+declare(strict_types=1);
+
+namespace {{ packageNamespace }}\Descriptors;
+
+use {{ packageNamespace }}\Signature\{{ providerClass }};
+use Nexia\AppDescriptors\AppDescriptorSet;
+use Nexia\AppDescriptors\SignatureDocumentDataFieldDescriptor;
+use Nexia\AppDescriptors\SignatureDocumentDataSourceDescriptor;
+use Nexia\Signature\Contracts\SignatureDocumentDataSourceContribution;
+use Nexia\Signature\SignatureDataClassification;
+use Nexia\Signature\SignatureDocumentDataCardinality;
+use Nexia\Signature\SignatureDocumentDataFieldType;
+use Nexia\Signature\SignatureDocumentDataFormatter;
+use Nexia\Signature\SignatureDocumentDataLookupMode;
+
+/**
+ * Explicit App-owned contract for {{ sourceKey }}. This is not generated from
+ * a model, migration, cast, fillable list, or another App's domain surface.
+ */
+final class {{ contributionClass }} implements SignatureDocumentDataSourceContribution
+{
+    public function __construct(private readonly {{ providerClass }} $provider) {}
+
+    public static function appDescriptors(): AppDescriptorSet
+    {
+        return AppDescriptorSet::from([
+            new SignatureDocumentDataSourceDescriptor(
+                appKey: '{{ appKey }}',
+                sourceKey: {{ providerClass }}::SOURCE_KEY,
+                sourceVersion: {{ providerClass }}::SOURCE_VERSION,
+                supportedSubjectResourceKeys: ['{{ subjectResourceKey }}'],
+                cardinality: SignatureDocumentDataCardinality::{{ cardinalityCase }},
+                lookupMode: SignatureDocumentDataLookupMode::{{ lookupModeCase }},
+                providedDataContracts: [],
+                fields: [
+                    new SignatureDocumentDataFieldDescriptor(
+                        key: '{{ fieldKey }}',
+                        type: SignatureDocumentDataFieldType::{{ fieldTypeCase }},
+                        required: true,
+                        classification: SignatureDataClassification::{{ fieldClassificationCase }},
+                        formatters: [SignatureDocumentDataFormatter::{{ fieldFormatterCase }}],
+                        labelKey: '{{ fieldLabelKey }}',
+                    ),{{ manyFields }}
+                ],
+                syntheticSample: [
+                    '{{ fieldKey }}' => {{ fieldSyntheticValue }},{{ manySyntheticSample }}
+                ],
+                labelKey: '{{ labelKey }}',
+                descriptionKey: '{{ descriptionKey }}',
+                {{ defaultSourceRefAnchorArgument }}
+                {{ stableSortArgument }}
+            ),
+        ]);
+    }
+
+    public function signatureDocumentDataSourceProviders(): array
+    {
+        return [$this->provider];
+    }
+}

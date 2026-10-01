@@ -1,0 +1,21 @@
+<?php
+
+declare(strict_types=1);
+
+use Nexia\Contribution\ResourceLegalEntityParticipation;
+use Nexia\Contribution\ResourceRecordOwner;
+use Nexia\Permission\AssignmentScope;
+use {{ packageNamespace }}\Contribution\Resources\{{ ResourceName }}Module;
+
+test('{{ resourceLower }} publishes an explicit resource authorization contract', function () {
+    $contract = {{ ResourceName }}Module::resourceAuthorization();
+
+    expect($contract->recordOwner)->toBe(ResourceRecordOwner::{{ recordOwnerCase }})
+        ->and($contract->permissionScope)->toBe(AssignmentScope::{{ assignmentScopeCase }})
+        ->and($contract->legalEntityParticipation)->toBe(
+            ResourceLegalEntityParticipation::{{ legalEntityParticipationCase }},
+        )
+        ->and({{ ResourceName }}Module::permissionAssignmentScope())->toBe(
+            AssignmentScope::{{ assignmentScopeCase }},
+        );
+});

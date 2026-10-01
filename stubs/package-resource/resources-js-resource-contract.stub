@@ -1,0 +1,156 @@
+import type { useTranslation } from 'react-i18next';
+import type {
+    ResourceActionDescriptor,
+    ResourceRef,
+} from '@nexia/sdk';
+
+export interface {{ ResourceName }}Record {
+    id: string;
+    public_id: string;
+    /** Present for Legal Entity-owned records; derived from the stored owner. */
+    legal_entity_public_id?: string | null;
+    legal_entity_label?: string | null;
+    name: string;
+    created_at: string | null;
+    updated_at: string | null;
+    actions: ResourceActionDecisions;
+}
+
+/** Editable business fields shared by the form and mutation. */
+export interface {{ ResourceName }}Input {
+    name: string;
+}
+
+export interface ResourceActionDecisions {
+    view: boolean;
+    update: boolean;
+    delete: boolean;
+}
+
+export const {{ resourceCamel }}ResourceType = '{{ appKey }}.{{ resourceLower }}';
+
+export const {{ resourceCamel }}Permissions = {
+    read: '{{ appKey }}.{{ resourceLower }}.read',
+    create: '{{ appKey }}.{{ resourceLower }}.create',
+    update: '{{ appKey }}.{{ resourceLower }}.update',
+    delete: '{{ appKey }}.{{ resourceLower }}.delete',
+} as const;
+
+interface {{ ResourceName }}ActionCallbacks {
+    /** Deprecated route callbacks; generated actions use canonical hrefs. */
+    onView?: () => void;
+    onEdit?: () => void;
+    onDelete?: () => void;
+    deleteDisabled?: boolean;
+    testIdPrefix?: string;
+}
+
+type {{ ResourceName }}ActionTranslator = ReturnType<
+    typeof useTranslation
+>['t'];
+
+/** One action contract shared by row menus and the Inspector. */
+export function {{ resourceCamel }}ResourceActions(
+    {{ resourceCamel }}: {{ ResourceName }}Record,
+    t: {{ ResourceName }}ActionTranslator,
+    callbacks: {{ ResourceName }}ActionCallbacks,
+): ResourceActionDescriptor[] {
+    const testId = (id: string) =>
+        callbacks.testIdPrefix
+            ? `${callbacks.testIdPrefix}-${id}`
+            : undefined;
+
+    return [
+        ...({{ resourceCamel }}.actions.view
+            ? [{
+                  id: 'show',
+                  label: t('common.actions.view'),
+                  permissions: [{{ resourceCamel }}Permissions.read],
+                  testId: testId('show'),
+                  href: {{ resourceCamel }}ShowRoute({{ resourceCamel }}ResourceId({{ resourceCamel }})),
+              }]
+            : []),
+        ...({{ resourceCamel }}.actions.update
+            ? [{
+                  id: 'edit',
+                  label: t('common.actions.edit'),
+                  permissions: [{{ resourceCamel }}Permissions.update],
+                  testId: testId('edit'),
+                  href: {{ resourceCamel }}EditRoute({{ resourceCamel }}ResourceId({{ resourceCamel }})),
+              }]
+            : []),
+        ...({{ resourceCamel }}.actions.delete
+            ? [{
+                  id: 'delete',
+                  label: t('common.actions.delete'),
+                  permissions: [{{ resourceCamel }}Permissions.delete],
+                  destructive: true,
+                  disabled: callbacks.deleteDisabled,
+                  testId: testId('delete'),
+                  onSelect: callbacks.onDelete,
+              }]
+            : []),
+    ];
+}
+
+export function {{ resourceCamel }}ApiRoute(
+    id?: string | number | null,
+    legalEntityId?: string | null,
+) {
+    // Canonical resource endpoints carry no Shell Legal Entity state. List and
+    // create targets are request-owned; record endpoints derive the owner.
+    void legalEntityId;
+    const base = {{ apiRouteBase }};
+
+    return id ? `${base}/${id}` : base;
+}
+
+export function {{ resourceCamel }}ListRoute() {
+    return '/apps/{{ appKey }}/{{ resourcePluralKebab }}';
+}
+
+export function {{ resourceCamel }}ShowRoute(id: string | number) {
+    return `/apps/{{ appKey }}/{{ resourcePluralKebab }}/${id}`;
+}
+
+export function {{ resourceCamel }}CreateRoute() {
+    return '/apps/{{ appKey }}/{{ resourcePluralKebab }}/new';
+}
+
+export function {{ resourceCamel }}EditRoute(id: string | number) {
+    return `/apps/{{ appKey }}/{{ resourcePluralKebab }}/${id}/edit`;
+}
+
+export function {{ resourceCamel }}Route(id?: string | number | null) {
+    return id ? {{ resourceCamel }}ShowRoute(id) : {{ resourceCamel }}ListRoute();
+}
+
+export function {{ resourceCamel }}ResourceId(
+    {{ resourceCamel }}: Pick<{{ ResourceName }}Record, 'id' | 'public_id'>,
+) {
+    return String({{ resourceCamel }}.public_id ?? {{ resourceCamel }}.id);
+}
+
+export function {{ resourceCamel }}ResourceRef(
+    {{ resourceCamel }}: {{ ResourceName }}Record,
+): ResourceRef<{{ ResourceName }}Record> {
+    const id = {{ resourceCamel }}ResourceId({{ resourceCamel }});
+
+    return {
+        type: {{ resourceCamel }}ResourceType,
+        id,
+        label: {{ resourceCamel }}.name,
+        ...({{ resourceCamel }}.actions.view
+            ? { route: {{ resourceCamel }}ShowRoute(id) }
+            : {}),
+        data: {{ resourceCamel }},
+    };
+}
+
+/** Metadata loads with the App; the Inspector implementation stays lazy. */
+export const resourceInspector = {
+    type: {{ resourceCamel }}ResourceType,
+    load: () => import('{{ inspectorModule }}').then(module => ({
+        default: module.{{ ResourceName }}Inspector,
+    })),
+};

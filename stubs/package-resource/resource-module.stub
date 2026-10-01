@@ -1,0 +1,154 @@
+<?php
+
+declare(strict_types=1);
+
+namespace {{ packageNamespace }}\Contribution\Resources;
+
+use {{ packageNamespace }}\Models\{{ ResourceName }};
+use Nexia\AppDescriptors\DescriptorStatus;
+use Nexia\AppDescriptors\ResourceDescriptor;
+use Nexia\AppDescriptors\ResourceMutationDescriptor;
+use Nexia\AppRuntime\ShellResourceDescriptor;
+use Nexia\AppRuntime\Contracts\ShellResourceContribution;
+use Nexia\Contribution\AbstractResourceModule;
+use Nexia\Contribution\ResourceAuthorizationContract;
+use Nexia\Contribution\Contracts\ResourceAuthorizationContribution;
+use Nexia\Contribution\Contracts\ResourceCatalogContribution;
+use Nexia\Contribution\ResourceLegalEntityParticipation;
+use Nexia\Contribution\ResourceModuleDefinition;
+use Nexia\Contribution\ResourceRecordOwner;
+use Nexia\Navigation\Concerns\ContributesNavigationDestination;
+use Nexia\Navigation\Concerns\ContributesNavigationDestinationActions;
+use Nexia\Navigation\Contracts\NavigationContribution;
+use Nexia\Navigation\ShellNavigationLocateAction;
+use Nexia\Permission\AssignmentScope;
+use Nexia\Permission\Concerns\ContributesResourcePermissions;
+use Nexia\Permission\Contracts\PermissionContribution;
+use Nexia\Reports\Contracts\ReportContribution;
+use Nexia\Reports\ReportDefinition;
+
+final class {{ ResourceName }}Module extends AbstractResourceModule implements NavigationContribution, PermissionContribution, ResourceAuthorizationContribution, ResourceCatalogContribution, ShellResourceContribution, ReportContribution
+{
+    use ContributesNavigationDestination;
+    use ContributesNavigationDestinationActions;
+    use ContributesResourcePermissions;
+    public static function shellResource(): ShellResourceDescriptor
+    {
+        return new ShellResourceDescriptor(shapes: ['list', 'record']);
+    }
+
+    protected static array $navigation = [
+        'path' => '{{ resourcePluralKebab }}',
+        'icon' => '{{ resourceIcon }}',
+        'order' => {{ resourceSort }},
+        'context' => 'app',
+        'group' => '{{ navigationGroup }}',
+        'subgroup' => {{ navigationSubgroupLiteral }},
+        'visible' => {{ navigationVisible }},
+        'permission' => ['{{ appKey }}.{{ resourceLower }}.read', '{{ appKey }}.{{ resourceLower }}.create'],
+    ];
+
+    public static function resourceKey(): string
+    {
+        return '{{ appKey }}.{{ resourceLower }}';
+    }
+
+    public static function resourceModelClass(): string
+    {
+        return {{ ResourceName }}::class;
+    }
+
+    public static function reports(): array
+    {
+        return [ReportDefinition::count(self::resourceKey().'.count', '{{ resourceKey }}.list.title', self::resourceKey())];
+    }
+
+    public static function resourceModuleDefinition(): ResourceModuleDefinition
+    {
+        // Input contracts describe the owning controller, not the database columns.
+        // Keep these aligned when changing store/update validation or target selection.
+        $inputProperties = [
+            'name' => ['type' => 'string', 'minLength' => 1, 'maxLength' => 255],
+            ...({{ legalEntityOwned }} ? ['legal_entity_public_id' => ['type' => 'string', 'format' => 'uuid']] : []),
+        ];
+
+        return ResourceModuleDefinition::fromDescriptor(new ResourceDescriptor(
+            key: self::resourceKey(),
+            version: '1.0',
+            labelKey: '{{ resourceKey }}.list.title',
+            status: DescriptorStatus::Active,
+            fieldSchema: [
+                // Report composition is opt-in: add only business fields with
+                // reviewed labels and authorization; never infer model columns.
+                // Person selector example; eligibility is login-member-only:
+                // 'person_party_public_id' => [
+                //     'type' => 'resource_reference',
+                //     'accepted_resource_keys' => ['directory.party'],
+                //     'selector_purpose' => '{{ appKey }}.reference-options',
+                //     'selector_permissions' => ['{{ appKey }}.{{ resourceLower }}.create'],
+                //     'party_selection' => [
+                //         'types' => ['person'],
+                //         // 'eligibility' => 'active_legal_entity_member',
+                //     ],
+                // ],
+                'public_id' => [
+                    'type' => 'string',
+                    'format' => 'uuid',
+                    'label_key' => '{{ resourceKey }}.id.label',
+                ],
+                'name' => [
+                    'type' => 'string',
+                    'label_key' => '{{ resourceKey }}.name.label',
+                    'composition' => ['selectable' => true, 'groupable' => true, 'filter_operators' => ['eq', 'in', 'contains', 'starts_with', 'ends_with', 'is_null', 'not_null']],
+                ],
+                // Generated baseline for timestamped models. Remove it when the
+                // model does not use timestamps rather than fabricating a field.
+                'created_at' => [
+                    'type' => 'string',
+                    'format' => 'date-time',
+                    'label_key' => 'common.fields.created_at',
+                    'composition' => ['selectable' => true, 'groupable' => true, 'time_buckets' => ['day', 'month', 'quarter', 'year'], 'filter_operators' => ['eq', 'neq', 'gt', 'gte', 'lt', 'lte', 'between', 'is_null', 'not_null']],
+                ],
+            ],
+            searchSchema: [
+                'label_fields' => ['name'],
+            ],
+            mutation: new ResourceMutationDescriptor(
+                createInputSchema: ['type' => 'object', 'properties' => $inputProperties, 'required' => ['name']],
+                updateInputSchema: ['type' => 'object', 'properties' => $inputProperties],
+            ),
+        ));
+    }
+
+    public static function permissionAssignmentScope(): AssignmentScope
+    {
+        return AssignmentScope::{{ assignmentScopeCase }};
+    }
+
+    public static function resourceAuthorization(): ResourceAuthorizationContract
+    {
+        return ResourceAuthorizationContract::standard(
+            ResourceRecordOwner::{{ recordOwnerCase }},
+            AssignmentScope::{{ assignmentScopeCase }},
+            ResourceLegalEntityParticipation::{{ legalEntityParticipationCase }},
+        );
+    }
+
+    public static function permissionResources(): array
+    {
+        return [
+            '{{ appKey }}.{{ resourceLower }}' => ['read', 'create', 'update', 'delete'],
+        ];
+    }
+
+    protected static function agentNavigationActionDefinitions(): array
+    {
+        return [
+            ShellNavigationLocateAction::make(
+                action: '{{ appKey }}.{{ resourceCamel }}.locate',
+                url: '/apps/{{ appKey }}/{{ resourcePluralKebab }}',
+                permission: '{{ appKey }}.{{ resourceLower }}.read',
+            ),
+        ];
+    }
+}

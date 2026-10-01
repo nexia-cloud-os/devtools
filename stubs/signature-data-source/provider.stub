@@ -1,0 +1,100 @@
+<?php
+
+declare(strict_types=1);
+
+namespace {{ packageNamespace }}\Signature;
+
+use Nexia\Signature\Contracts\SignatureDocumentDataSourceProvider;
+use Nexia\Signature\SignatureDocumentDataDiagnostic;
+use Nexia\Signature\SignatureDocumentDataDiagnosticCode;
+use Nexia\Signature\SignatureDocumentDataQuery;
+use Nexia\Signature\SignatureDocumentDataResult;
+use Nexia\Signature\SignatureDocumentDataStatus;
+
+/**
+ * Fail-closed source skeleton. Implement the App-owned lookup only after the
+ * explicit authorization and provenance TODOs below are complete.
+ */
+final readonly class {{ providerClass }} implements SignatureDocumentDataSourceProvider
+{
+    public const SOURCE_KEY = '{{ sourceKey }}';
+
+    public const SOURCE_VERSION = {{ sourceVersion }};
+
+    private const SUBJECT_RESOURCE_KEY = '{{ subjectResourceKey }}';
+
+    private const SOURCE_RESOURCE_KEY = '{{ sourceResourceKey }}';
+
+    private const SUBJECT_ANCHOR = '{{ subjectAnchor }}';
+
+{{ sourceRefAnchorConstant }}
+
+    private const MIN_ITEMS = {{ minItems }};
+
+    private const MAX_ITEMS = {{ maxItems }};{{ stableOrderConstants }}
+
+    private const LOOKUP_TIMEOUT_SECONDS = 5;
+
+    /** @var non-empty-list<string> */
+    private const FIELD_KEYS = ['{{ fieldKey }}'{{ manyFieldKey }}];
+
+    public function appKey(): string
+    {
+        return '{{ appKey }}';
+    }
+
+    public function sourceKey(): string
+    {
+        return self::SOURCE_KEY;
+    }
+
+    public function sourceVersion(): int
+    {
+        return self::SOURCE_VERSION;
+    }
+
+    public function resolve(SignatureDocumentDataQuery $query): SignatureDocumentDataResult
+    {
+        if (! $this->matchesContract($query)) {
+            return self::unavailable(SignatureDocumentDataDiagnosticCode::Forbidden);
+        }
+
+        // TODO: Reauthorize the exact actor against every requested protected
+        // field. Do not treat signature-request authority as source authority.
+        // TODO: Reauthorize the exact subject ResourceRef; do not infer a
+        // subject from party_id, a model relation, or a different App.
+        // TODO: Reauthorize the exact source/selected ResourceRef(s), including
+        // tenant and Legal Entity ownership, before each candidate and render.
+        // TODO: Apply query->asOf to an App-owned bounded lookup and enforce
+        // MIN_ITEMS/MAX_ITEMS. Never issue an unbounded collection lookup.
+        // TODO: Bound the lookup to LOOKUP_TIMEOUT_SECONDS and return the
+        // value-free Timeout diagnostic when the App-owned deadline is reached.
+        // TODO: For many results, sort deterministically by STABLE_SORT_KEY and
+        // a unique App-owned tie-breaker before returning candidate/result DTOs.
+        // TODO: Keep protected values out of exceptions, logs, telemetry, and
+        // queue payloads; return only a value-free unavailable diagnostic here.
+        // TODO: Add an App-local authorization regression test under
+        // tests/Feature/Signature/ that proves actor, source permission,
+        // subject/source-ref, as-of, selected-ref, and tenant/Legal Entity
+        // reauthorization all fail closed.
+
+        return self::unavailable(SignatureDocumentDataDiagnosticCode::Forbidden);
+    }
+
+    private function matchesContract(SignatureDocumentDataQuery $query): bool
+    {
+        return $query->appKey === $this->appKey()
+            && $query->sourceKey === self::SOURCE_KEY
+            && $query->sourceVersion === self::SOURCE_VERSION
+            && $query->subjectResourceRef->resourceKey === self::SUBJECT_RESOURCE_KEY
+            && array_diff($query->requestedFieldKeys, self::FIELD_KEYS) === [];
+    }
+
+    private static function unavailable(SignatureDocumentDataDiagnosticCode $code): SignatureDocumentDataResult
+    {
+        return new SignatureDocumentDataResult(
+            SignatureDocumentDataStatus::Unavailable,
+            diagnostics: [new SignatureDocumentDataDiagnostic($code)],
+        );
+    }
+}

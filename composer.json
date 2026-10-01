@@ -1,0 +1,33 @@
+{
+    "name": "nexia-cloud-os/devtools",
+    "description": "Standalone Nexia App source generators",
+    "type": "library",
+    "license": "proprietary",
+    "require": {
+        "php": "^8.4",
+        "nexia-cloud-os/sdk-laravel": "^0.7.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "Nexia\\Devtools\\": "src/"
+        }
+    },
+    "bin": [
+        "bin/nexia-app"
+    ],
+    "scripts": {
+        "test": "@php -d zend.assertions=1 -d assert.exception=1 tests/generate.php"
+    },
+    "replace": {
+        "nexia/devtools": "self.version",
+        "nexia/app-devtools": "self.version"
+    },
+    "archive": {
+        "exclude": [
+            "/vendor/",
+            "/node_modules/",
+            "/composer.local.*",
+            "/tmp/"
+        ]
+    }
+}

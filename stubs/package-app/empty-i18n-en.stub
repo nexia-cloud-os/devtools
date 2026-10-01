@@ -1,0 +1,7 @@
+{
+    "permissions.groups.{{ appKey }}.description": "Permissions provided by the {{ appTitle }} app.",
+    "permissions.groups.{{ appKey }}.label": "{{ appTitle }}",
+    "{{ appKey }}.overview.empty.description": "Choose an available page from the App menu.",
+    "{{ appKey }}.overview.subtitle": "Welcome to {{ appTitle }}.",
+    "{{ appKey }}.overview.title": "{{ appTitle }}"
+}

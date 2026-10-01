@@ -1,0 +1,72 @@
+<?php
+
+declare(strict_types=1);
+
+namespace {{ packageNamespace }}\Filament\Tenant\Resources\{{ ResourcePluralStudly }};
+
+use {{ packageNamespace }}\Filament\Tenant\Resources\{{ ResourcePluralStudly }}\Pages\List{{ ResourcePluralStudly }};
+use {{ packageNamespace }}\Filament\Tenant\Resources\{{ ResourcePluralStudly }}\Pages\View{{ ResourceName }};
+use {{ packageNamespace }}\Models\{{ ResourceName }};
+use BackedEnum;
+use Filament\Actions\ViewAction;
+use Filament\Forms\Components\TextInput;
+use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Table;
+
+/**
+ * Tenant operator backoffice inspection for {{ resourceTitle }}.
+ *
+ * This package-local Filament resource mirrors the core inspect-only
+ * collection-resource baseline while keeping the implementation inside the
+ * app package. Customer-facing processes still belong in the React shell
+ * surfaces generated under resources/js/resources/.
+ */
+class {{ ResourceName }}Resource extends Resource
+{
+    protected static ?string $model = {{ ResourceName }}::class;
+
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+
+    protected static ?string $navigationLabel = '{{ resourcePluralTitle }}';
+
+    protected static ?string $modelLabel = '{{ resourceTitle }}';
+
+    public static function form(Schema $schema): Schema
+    {
+        return $schema->components([
+            TextInput::make('id')->label(__('{{ resource_key }}.id.label'))->disabled(),
+            TextInput::make('name')->disabled(),
+            // TODO: replace with the fields the operator should inspect.
+        ]);
+    }
+
+    public static function table(Table $table): Table
+    {
+        return $table
+            ->columns([
+                TextColumn::make('id')->label(__('{{ resource_key }}.id.label'))->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('name')->searchable()->sortable(),
+                TextColumn::make('created_at')->dateTime()->sortable(),
+            ])
+            ->defaultSort('created_at', 'desc')
+            ->recordActions([
+                ViewAction::make(),
+            ]);
+    }
+
+    public static function canCreate(): bool
+    {
+        return false;
+    }
+
+    public static function getPages(): array
+    {
+        return [
+            'index' => List{{ ResourcePluralStudly }}::route('/'),
+            'view' => View{{ ResourceName }}::route('/{record}'),
+        ];
+    }
+}

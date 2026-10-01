@@ -1,0 +1,70 @@
+# AGENTS.md
+
+## Purpose
+
+Repository rules for the `{{ appKey }}` Nexia App Package.
+
+## Host boundary
+
+- Work only in this App repository. Do not copy, mount, edit or deploy Core,
+  Sandbox, CLI or SDK source/runtime images. The platform operator owns them.
+- Import PHP platform contracts from `nexia-cloud-os/sdk-laravel` and
+  frontend contracts from `@nexia/sdk`. Do not import Core or another App.
+- Preserve the Composer PSR-4 namespace and registered App identity. Use
+  Resource References, public contracts and declared events for cross-App work.
+- Use `nexia link` and `nexia dev` for the operator-managed Sandbox. Keep
+  secrets and server code outside public/. Never request login tokens in chat.
+- Keep required installation data in this App's initializer; sample data is
+  separate. Do not run other Apps' seeders or edit their migrations.
+- App Family and launcher order are review requests; central administrators
+  approve the catalog presentation.
+- Report missing SDK/platform capabilities through developer-support. Prepare
+  sanitized reports for developer review before submission.
+
+## Organization scope UI
+
+- Put page-owned organization scope in the Route Surface `organizationScope`
+  slot through the SDK `NxOrganizationTargetSelector`; it renders after the
+  breadcrumb and before header actions, and is not an action. Do
+  not repeat it in a ResourceTable toolbar or `meta.list_schema.filterable`
+  flyout.
+- Generated standard common-data profiles render no selector. A tenant-owned
+  custom relation or Operating Unit page may declare one. The Route Surface
+  explicitly chooses its supported axes and read permission; ownership,
+  applicability, and permission scope are distinct. Never infer scope from
+  columns.
+- Default an ordinary list to `useOrganizationListScope` with its read
+  permission. Custom relationship or multi-permission pages keep their own URL
+  adapter; do not force those authorities into the shared hook.
+- Keep status, type, date, and other record conditions as ResourceTable filters.
+- Compose forms with public NxFormSection/NxFormField inputs and the shared
+  draft binding. Use NxResourceFormLegalEntityField for an authorized create
+  target or the stored owner's human label on edit. Keep read content as
+  text/links/badges, not disabled inputs. RecordSurface owns read/create/edit
+  modes; do not infer editing authority from the route or hide a mounted form.
+  Do not add a frontend Information Schema or duplicate owner selectors.
+
+
+## Safety
+
+- Tenant data and execution remain isolated.
+- Authentication does not grant authorization; protected operations are
+  enforced in the backend.
+- Async work restores the tenant and actor context it requires.
+- Durable product state does not depend only on browser storage.
+
+Draft implementation and follow-up revisions defer automated validation. When
+the user requests testing, verification, finalization, a commit, a push, or a
+pull request, run the smallest focused validation that can disprove the changed
+risk once. Reuse successful evidence while its relevant scope is unchanged.
+Do not commit, push, publish, or mutate external services without explicit user
+authorization.
+
+## Change delivery
+
+Use a purpose-named work branch in each changed repository. Do not create
+change commits on, or push directly to, `main` or `develop`. Deliver through a
+PR/MR and describe related Core/SDK/App changes and their merge order. Creating
+a PR/MR does not authorize merging it; merge requires explicit user approval.
+Do not weaken branch protection. Core, SDK, and App developers follow the same
+workflow; no developer-specific local policy file is required.

@@ -1,0 +1,21 @@
+services:
+  dev:
+    build:
+      context: .
+    user: "${NEXIA_UID:-10001}:${NEXIA_GID:-10001}"
+    command: ["dev", "--container", "--port", "${NEXIA_PORT:-4310}"]
+    ports:
+      - "127.0.0.1:${NEXIA_PORT:-4310}:${NEXIA_PORT:-4310}"
+    environment:
+      NEXIA_CONFIG_HOME: /nexia-config/${NEXIA_UID:-10001}
+      npm_config_cache: /tmp/npm
+    volumes:
+      - .:/workspace
+      - nexia-login:/nexia-config
+    extra_hosts:
+      - developers.localhost:host-gateway
+      - developers.nexia.test:host-gateway
+    stdin_open: true
+    tty: true
+volumes:
+  nexia-login:

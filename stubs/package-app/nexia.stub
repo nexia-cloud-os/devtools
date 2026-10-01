@@ -1,0 +1,43 @@
+{
+    "schema_version": "2",
+    "runtime": "laravel",
+    "core_version": "^0.6.21",
+    "platform": {
+        "schema_version": 1,
+        "runtime": "nexia-php84-v1",
+        "contracts": {
+            "catalog": 1,
+            "resource": 1,
+            "action": 1,
+            "settings": 1,
+            "event": 1
+        },
+        "required_capabilities": [
+            "resource.catalog",
+            "action.catalog",
+            "settings.catalog",
+            "event.catalog"
+        ],
+        "optional_capabilities": [],
+        "integrations": []
+    },
+    "test_paths": [
+        "tests"
+    ],
+    "navigation": [
+        { "screen": "{{ appKey }}", "group": null, "sort": 0, "icon": "{{ appIcon }}" }
+    ],
+    "app": {
+        "manifest": "{{ packageNamespaceJson }}\\{{ appName }}AppManifest",
+        "app_family": "{{ appFamily }}",
+        "app_icon": "{{ appIcon }}",
+        "launcher_order": {{ appLauncherOrder }},
+        "overview_navigation_id": "{{ appOverviewNavigationId }}",
+        "app_name": {{ appDisplayNameJson }},
+        "app_key": "{{ appKey }}",
+        "app_table_prefix": "{{ appTablePrefix }}",
+        "prerequisite_apps": {{ prerequisiteAppsJson }},
+        "descriptions": {{ appDescriptionsJson }},
+        "readiness": "{{ appReadiness }}"
+    }
+}

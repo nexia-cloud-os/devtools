@@ -1,0 +1,24 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+// Load only the tool's own dependencies, never the current App's bootstrap.
+$autoload = $_composer_autoload_path ?? dirname(__DIR__).'/vendor/autoload.php';
+if (! is_file($autoload)) {
+    fwrite(STDERR, "Install nexia-cloud-os/devtools with Composer before running nexia-app.\n");
+    exit(1);
+}
+require $autoload;
+$app = new Illuminate\Foundation\Application(getcwd());
+$app->instance('config', new Illuminate\Config\Repository);
+$app->instance('events', new Illuminate\Events\Dispatcher($app));
+Illuminate\Support\Facades\Facade::setFacadeApplication($app);
+$console = new Illuminate\Console\Application($app, $app['events'], '1');
+$console->setName('Nexia App tools');
+$console->resolve(Nexia\Devtools\Commands\MakePackageApp::class);
+$console->resolve(Nexia\Devtools\Commands\MakePackageResource::class);
+$console->resolve(Nexia\Devtools\Commands\MakePackagePage::class);
+$console->resolve(Nexia\Devtools\Commands\MakePackageSignatureDocumentDataSource::class);
+$console->resolve(Nexia\Devtools\Commands\ValidateApp::class);
+exit($console->run());

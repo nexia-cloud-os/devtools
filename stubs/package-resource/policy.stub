@@ -1,0 +1,57 @@
+<?php
+
+declare(strict_types=1);
+
+namespace {{ packageNamespace }}\Policies;
+
+use Nexia\Laravel\Access\Contracts\ResourceAuthorization;
+use Nexia\Laravel\Access\Concerns\EvaluatesPermissionDecision;
+use Nexia\Identity\Contracts\Actor;
+use {{ packageNamespace }}\Models\{{ ResourceName }};
+
+/**
+ * Authorization for {{ ResourceName }}.
+ *
+ * Generated for a package-owned tenant resource. This mirrors the core
+ * collection-resource policy shape while using package-owned permission keys.
+ */
+class {{ ResourceName }}Policy
+{
+    use EvaluatesPermissionDecision;
+
+    public function viewAny(Actor $user): bool
+    {
+        return $this->allowsPermission($user, '{{ appKey }}.{{ resourceLower }}.read');
+    }
+
+    public function view(Actor $user, {{ ResourceName }} ${{ resourceLower }}): bool
+    {
+        return $this->allowsPermission($user, '{{ appKey }}.{{ resourceLower }}.read')
+            && $this->matchesAuthorizationContract(${{ resourceLower }});
+    }
+
+    public function create(Actor $user): bool
+    {
+        return $this->allowsPermission($user, '{{ appKey }}.{{ resourceLower }}.create');
+    }
+
+    public function update(Actor $user, {{ ResourceName }} ${{ resourceLower }}): bool
+    {
+        return $this->allowsPermission($user, '{{ appKey }}.{{ resourceLower }}.update')
+            && $this->matchesAuthorizationContract(${{ resourceLower }});
+    }
+
+    public function delete(Actor $user, {{ ResourceName }} ${{ resourceLower }}): bool
+    {
+        // Destructive lifecycle actions are opt-in. Keep the generated
+        // delete route and row action available for the domain owner to
+        // enable explicitly after choosing the resource lifecycle.
+        return false;
+    }
+
+    private function matchesAuthorizationContract({{ ResourceName }} ${{ resourceLower }}): bool
+    {
+        return app(ResourceAuthorization::class)
+            ->recordMatches(${{ resourceLower }}, '{{ appKey }}.{{ resourceLower }}');
+    }
+}

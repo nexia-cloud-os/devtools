@@ -1,0 +1,125 @@
+import { queryOptions, useMutation, useQueryClient } from '@tanstack/react-query';
+import type { ResourceListParams, ResourceListSchema, ResourceTransferMeta } from '@nexia/sdk';
+import { api, serializeResourceTableSort } from '@nexia/sdk/host';
+import { {{ resourceCamel }}ApiRoute, type {{ ResourceName }}Record } from './{{ resourceKebab }}-resource-contract.ts';
+
+export interface {{ ResourceName }}DetailResponse {
+    {{ resourceLower }}: {{ ResourceName }}Record;
+}
+
+export function {{ resourceCamel }}DetailQueryOptions(
+    tenantId: string,
+    id: string,
+) {
+    const resourceContextId = tenantId;
+
+    return queryOptions({
+        queryKey: [
+            '{{ appKey }}-{{ resourceKebab }}',
+            tenantId,
+            resourceContextId,
+            id,
+        ],
+        queryFn: async ({ signal }) => {
+            const { data } = await api.get<{{ ResourceName }}DetailResponse>(
+                {{ apiDetailRouteExpression }},
+                { signal },
+            );
+            return data;
+        },
+    });
+}
+
+interface {{ ResourceName }}ListResponse {
+    data: {{ ResourceName }}Record[];
+    meta: {
+        current_page: number;
+        last_page: number;
+        per_page: number;
+        total: number;
+        list_schema: ResourceListSchema;
+        actions: {
+            create: boolean;
+        };
+        resource_transfer?: ResourceTransferMeta | null;
+    };
+}
+
+export function {{ resourceCamel }}ListQueryScope(
+    tenantId: string,
+    resourceContextId: string | number | null,
+) {
+    return [
+        '{{ appKey }}-{{ resourcePluralKebab }}',
+        tenantId,
+        resourceContextId,
+    ] as const;
+}
+
+export async function fetch{{ ResourceName }}List(
+    legalEntityPublicIds: readonly string[],
+    listParams: ResourceListParams,
+    signal?: AbortSignal,
+): Promise<{{ ResourceName }}ListResponse> {
+    const params: Record<string, string | number | string[]> = {};
+    if (listParams.search) params.search = listParams.search;
+    if (listParams.sort)
+        params.sort = serializeResourceTableSort(listParams.sort);
+    if (listParams.page && listParams.page > 1)
+        params.page = listParams.page;
+    if (listParams.perPage) params.per_page = listParams.perPage;
+    for (const [key, value] of Object.entries(listParams.filters)) {
+        if (Array.isArray(value)) {
+            if (value.length > 0) params[`filter[${key}]`] = value;
+        } else if (value !== '' && value !== undefined) {
+            params[`filter[${key}]`] = value;
+        }
+    }
+    if (legalEntityPublicIds.length > 0) {
+        params['legal_entity_public_ids[]'] = [...legalEntityPublicIds];
+    }
+    const { data } = await api.get<{{ ResourceName }}ListResponse>(
+        {{ apiListRouteExpression }},
+        { params, signal },
+    );
+    return data;
+}
+
+export function {{ resourceCamel }}ListQueryOptions(
+    tenantId: string,
+    legalEntityPublicIds: readonly string[],
+    listParams: ResourceListParams,
+) {
+    const resourceContextId = {{ legalEntityOwned }} ? legalEntityPublicIds.join(',') : tenantId;
+
+    return queryOptions({
+        queryKey: [
+            ...{{ resourceCamel }}ListQueryScope(tenantId, resourceContextId),
+            listParams,
+        ],
+        queryFn: ({ signal }) =>
+            fetch{{ ResourceName }}List(
+                legalEntityPublicIds,
+                listParams,
+                signal,
+            ),
+    });
+}
+
+
+/** Shared deletion and cache ownership for list and record Inspectors. */
+export function use{{ ResourceName }}Delete(tenantId: string) {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async (id: string) => {
+            await api.delete({{ apiDetailRouteExpression }});
+        },
+        onSuccess: (_data, deletedId) => {
+            queryClient.removeQueries({
+                queryKey: {{ resourceCamel }}DetailQueryOptions(tenantId, deletedId).queryKey,
+                exact: true,
+            });
+            void queryClient.invalidateQueries({ queryKey: ['{{ appKey }}-{{ resourcePluralKebab }}', tenantId] });
+        },
+    });
+}

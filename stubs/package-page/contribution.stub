@@ -1,0 +1,29 @@
+<?php
+
+declare(strict_types=1);
+
+namespace {{ packageNamespace }}\Contribution\Pages;
+
+use Nexia\Navigation\Contracts\NavigationContribution;
+use Nexia\Navigation\NavigationItem;
+use Nexia\Permission\AssignmentScope;
+use Nexia\Permission\Contracts\PermissionContribution;
+use Nexia\Permission\PermissionDefinition;
+
+final class {{ PageName }}Module implements NavigationContribution, PermissionContribution
+{
+    public static function navigationItems(): array
+    {
+        return [NavigationItem::make(
+            id: '{{ appKey }}.page.{{ pageKey }}', route: '/apps/{{ appKey }}/{{ pageSlug }}',
+            icon: 'layout-dashboard', sort: {{ sort }}, labelKey: '{{ appKey }}.pages.{{ pageKey }}.title',
+            appKey: '{{ appKey }}', contextId: 'app', groupId: '{{ navigationGroup }}',
+            permission: '{{ appKey }}.{{ pageKey }}.read',
+        )];
+    }
+
+    public static function catalogPermissionDefinitions(): array
+    {
+        return [PermissionDefinition::make('{{ appKey }}', '{{ pageKey }}', 'read', assignmentScope: AssignmentScope::Tenant)];
+    }
+}

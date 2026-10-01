@@ -1,0 +1,18 @@
+<?php
+
+declare(strict_types=1);
+
+namespace {{ packageNamespace }}\Http\Controllers;
+
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+
+final class {{ PageName }}Controller
+{
+    public function index(Request $request): JsonResponse
+    {
+        // Compose authorized App queries or public SDK capabilities here.
+        // Do not report an empty business result before implementing the query.
+        abort(501);
+    }
+}

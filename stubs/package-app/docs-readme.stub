@@ -1,0 +1,59 @@
+# {{ appTitle }} App Design
+
+> Design status: Not started. This file is the App's design entry point. Split a
+> section into a dedicated document only when the section can no longer be
+> reviewed clearly here.
+
+## 1. Boundary and Adoption
+
+- **Owns:**
+- **Does not own:**
+- **App Family:** `{{ appFamily }}`
+- **App key:** `{{ appKey }}`
+- **Table prefix:** `{{ appTablePrefix }}`
+- **Installation prerequisites:** `{{ prerequisiteAppsJson }}`
+- **Independent-adoption rationale:**
+
+## 2. Logical Models
+
+Summarize the logical models by class here, then record each model's full
+definition, relationships, and invariants in [DOMAIN-MODEL.md](DOMAIN-MODEL.md).
+Cover every logical model needed to operate this App, not only models named by
+one current process. Keep the class order unchanged.
+
+| Class | Logical models |
+| --- | --- |
+| Master and definition | |
+| Policy and configuration | |
+| Operational | |
+| Core and cross-App references | |
+
+## 3. Process Templates
+
+| Process | Trigger | Steps and actors | Created or changed models | Approval / outcome |
+| --- | --- | --- | --- | --- |
+
+## 4. User Surfaces
+
+Record the exact App Menu, contextual routes, and entry points in
+[PAGES.md](PAGES.md). Summarize the accepted surface areas here without
+duplicating that page contract.
+
+| Surface area | Primary actor | Purpose | Models used |
+| --- | --- | --- | --- |
+
+## 5. Data and Implementation Design
+
+Add the logical ERD, table shape, state transitions, emitted or consumed events,
+and permission design here when implementation design begins. Do not create a
+physical resource, migration, or API surface until its ownership is accepted.
+
+## 6. Installation and Tenant Content
+
+| Kind | Content | Source | Tenant behavior |
+| --- | --- | --- | --- |
+
+## 7. Decisions and Deferred Work
+
+| Topic | Status | Decision or question | Follow-up |
+| --- | --- | --- | --- |

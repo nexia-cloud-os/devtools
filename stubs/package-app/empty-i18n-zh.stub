@@ -1,0 +1,7 @@
+{
+    "permissions.groups.{{ appKey }}.description": "{{ appTitle }} 应用提供的权限。",
+    "permissions.groups.{{ appKey }}.label": "{{ appTitle }}",
+    "{{ appKey }}.overview.empty.description": "请从应用菜单中选择可用页面。",
+    "{{ appKey }}.overview.subtitle": "欢迎使用 {{ appTitle }}。",
+    "{{ appKey }}.overview.title": "{{ appTitle }}"
+}

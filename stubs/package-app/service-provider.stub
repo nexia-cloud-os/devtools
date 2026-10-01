@@ -1,0 +1,32 @@
+<?php
+
+declare(strict_types=1);
+
+namespace {{ packageNamespace }};
+
+use Nexia\AppRuntime\AppPackageMetadataReader;
+use Nexia\AppRuntime\Contracts\AppRegistrar;
+use Illuminate\Support\ServiceProvider;
+
+class {{ appName }}ServiceProvider extends ServiceProvider
+{
+    public function register(): void
+    {
+        $definition = $this->app
+            ->make(AppPackageMetadataReader::class)
+            ->read(__DIR__.'/../composer.json');
+        $manifest = new {{ appName }}AppManifest($definition);
+
+        $this->app->instance({{ appName }}AppManifest::class, $manifest);
+    }
+
+    public function boot(): void
+    {
+        $this->app->make(AppRegistrar::class)->register(
+            $this->app->make({{ appName }}AppManifest::class),
+        );
+
+        $this->loadRoutesFrom(__DIR__.'/../routes/routes.php');
+        $this->loadJsonTranslationsFrom(__DIR__.'/../resources/lang');
+    }
+}

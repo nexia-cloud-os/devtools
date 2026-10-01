@@ -1,0 +1,28 @@
+<?php
+
+declare(strict_types=1);
+
+namespace {{ packageNamespace }}\Descriptors;
+
+use Nexia\AppDescriptors\Contracts\AppDescriptorContribution;
+use Nexia\AppDescriptors\AppDescriptorSet;
+
+/**
+ * {{ appName }} slot-widget descriptors.
+ *
+ * Lists the slot widgets the app contributes into shell-owned
+ * surfaces. The slot key namespace is closed and lives in
+ * `docs/reference/SHELL.md`; apps fill documented slots
+ * rather than inventing new ones. Return an empty list until the
+ * app ships a widget for an existing slot.
+ *
+ * @see docs/reference/DESCRIPTORS.md — current Slot Widget descriptor
+ * @see docs/reference/SHELL.md — current Slot Widget Contract
+ */
+final class {{ appName }}SlotWidgets implements AppDescriptorContribution
+{
+    public static function appDescriptors(): AppDescriptorSet
+    {
+        return AppDescriptorSet::empty();
+    }
+}

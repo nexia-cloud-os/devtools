@@ -1,0 +1,14 @@
+
+    public function show(Request $request, string $id): JsonResponse
+    {
+        // Resolve this business target using authorized queries, not an assumed model.
+        // Return the page-owned record shape and current actions.update decision.
+        abort(501);
+    }
+
+    public function update(Request $request, string $id): JsonResponse
+    {
+        // Recheck target/field authority, validate input and save the composed operation.
+        // Return the confirmed record; do not report success before business work completes.
+        abort(501);
+    }

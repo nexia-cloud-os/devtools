@@ -1,0 +1,10 @@
+{
+    "permissions.keys.{{ appKey }}.{{ resourceLower }}.create.description": "{{ resourcePluralTitle }} 생성을 허용합니다.",
+    "permissions.keys.{{ appKey }}.{{ resourceLower }}.create.label": "{{ resourcePluralTitle }} 생성",
+    "permissions.keys.{{ appKey }}.{{ resourceLower }}.delete.description": "{{ resourcePluralTitle }} 삭제를 허용합니다.",
+    "permissions.keys.{{ appKey }}.{{ resourceLower }}.delete.label": "{{ resourcePluralTitle }} 삭제",
+    "permissions.keys.{{ appKey }}.{{ resourceLower }}.read.description": "{{ resourcePluralTitle }} 조회를 허용합니다.",
+    "permissions.keys.{{ appKey }}.{{ resourceLower }}.read.label": "{{ resourcePluralTitle }} 조회",
+    "permissions.keys.{{ appKey }}.{{ resourceLower }}.update.description": "{{ resourcePluralTitle }} 수정을 허용합니다.",
+    "permissions.keys.{{ appKey }}.{{ resourceLower }}.update.label": "{{ resourcePluralTitle }} 수정"
+}

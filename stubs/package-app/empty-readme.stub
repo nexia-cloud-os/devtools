@@ -1,0 +1,98 @@
+# {{ appTitle }}
+
+App key: `{{ appKey }}`. Composer package: `{{ packageComposerName }}`.
+PHP namespace: `{{ packageNamespace }}`; PSR-4 source: `src/`.
+
+Read AGENTS.md and the design records in docs/. Install the public dependencies
+with Composer and npm in this App directory. The platform operator provides
+the Nexia Sandbox; this repository contains no Core installation.
+
+## Connect and run
+
+Create a project and prepare its sandbox at https://developers.nexia.to.
+From this App directory, use the public CLI:
+
+```sh
+nexia login <project-id>
+nexia link
+nexia make:resource Note --label-ko '메모'
+nexia app register
+composer install --no-scripts
+npm install
+nexia dev
+```
+
+Login opens a browser on a local interactive terminal; otherwise open its printed
+URL to approve the project connection. Keep dev running and open its workspace
+URL. Open Notes in a work tab, save a record, and reopen it to confirm persistence.
+`nexia dev` builds and watches React screens through the installed Vite tool.
+Use `nexia make:page ExamplePage --label-ko '예시'` for a page without a resource.
+
+`link` chooses the project, `app register` registers identity, and `dev` runs this
+App. Registration does not publish or install it. Use a separate dev terminal and
+port for each App; `nexia apps list` lists the project's registered Apps.
+After preparation, open **Development → Project Apps → Test permissions** in the console. Grant Note read, create and update permissions. Select a legal entity only when the App declares legal-entity-scoped permissions. Grants are explicit and expire with the sandbox. Refresh an already open App tab.
+
+Review generated fields, permissions, migrations and translations before
+submitting an immutable version for review.
+
+For a local or separately operated platform only, set
+`nexia config endpoint <URL>` before login. This clears the previous connection.
+
+## Docker tools
+
+Use the generated Dockerfile and Compose service when PHP/Node are not installed
+on the host. On macOS/Linux set `NEXIA_UID` and `NEXIA_GID` to `id -u` and `id -g`
+so generated files belong to you. On Windows omit those variables.
+
+```sh
+docker compose build
+docker compose run --rm dev login <project-id>
+docker compose run --rm dev link
+docker compose run --rm dev app register
+docker compose run --rm dev make:resource ExampleResource --label-ko 예시
+docker compose run --rm --entrypoint npm dev install
+docker compose up
+```
+
+For an alternate platform, run `docker compose run --rm dev config endpoint <URL>`
+before Docker login; the host CLI connection is separate. After preparation,
+grant the generated resource test permissions in the console, open the workspace
+URL, and save/reopen a record.
+
+The image contains public CLI/SDK/devtools only. The App is mounted at runtime;
+its files and secrets are excluded from the image build context. Docker login
+uses a private per-user directory in the named volume. Do not copy credentials
+from the host or remove the login volume merely to restart a command.
+
+
+## Checks
+
+```sh
+nexia validate
+composer install --no-scripts
+composer test
+```
+
+`nexia validate` parses source without running App code. The generated resource
+test checks its authorization declaration; add App-owned behavior tests for
+real data and permissions. Composer tests execute your App test code. Do not
+point local tests at a tenant database. Core's test classes are not dependencies.
+Frontend tests use `npm test` after installing dependencies; add actual test
+files before using that result as evidence.
+
+`nexia dev` builds and watches the App's React entry in `dist/frontend/`, including
+lazy surface chunks and a Vite manifest. SDK/React peers remain external for the
+Nexia host; this output is not a standalone HTML preview. The build does not load
+`.env` files or copy `public/`. Import browser assets explicitly from frontend
+source. Never import secrets or PHP files. Building executes your Vite config
+and dependencies; it is separate from the non-executing `nexia validate` check.
+
+With Docker, install in the same mounted App directory using
+`docker compose run --rm --entrypoint npm dev install`. Keep the generated
+package lock in your repository. Local builds require Node.js 22.12 or later and npm 11.6.2 (11.x).
+Without changing your global npm installation, run
+`npm exec --yes --package=npm@11.6.2 -- npm install` to create the lock.
+The generated Docker image already includes this npm version.
+
+Resource generation creates the PHP/React application screens by default. Add `--with-filament` only when you also need Filament administration screens. Omitting that option, including during `--force` regeneration, preserves existing administration files and their manifest registration.

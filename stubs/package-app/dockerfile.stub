@@ -1,0 +1,24 @@
+FROM node:22-bookworm-slim AS node
+RUN npm install --global --ignore-scripts --no-audit --no-fund npm@11.6.2
+FROM composer:2 AS composer
+FROM php:8.4-cli-bookworm
+RUN apt-get update && apt-get install -y --no-install-recommends git unzip libpq-dev libonig-dev libxml2-dev \
+    && docker-php-ext-install pdo_pgsql mbstring dom exif \
+    && rm -rf /var/lib/apt/lists/*
+COPY --from=node /usr/local/bin/node /usr/local/bin/node
+COPY --from=node /usr/local/lib/node_modules /usr/local/lib/node_modules
+COPY --from=composer /usr/bin/composer /usr/local/bin/composer
+RUN ln -s /usr/local/lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm
+ARG NEXIA_CLI_VERSION=alpha
+ARG NEXIA_DEVTOOLS_VERSION=^0.1
+ENV COMPOSER_HOME=/opt/nexia-composer
+RUN npm install --global --ignore-scripts --no-audit --no-fund "@nexia/cli@${NEXIA_CLI_VERSION}" \
+    && composer global require "nexia-cloud-os/devtools:${NEXIA_DEVTOOLS_VERSION}" --no-interaction --no-scripts --no-plugins --prefer-dist \
+    && mkdir -p /workspace /nexia-config && chmod 1777 /nexia-config
+ENV PATH="/opt/nexia-composer/vendor/bin:${PATH}"
+ENV COMPOSER_HOME=/tmp/nexia-composer
+ENV COMPOSER_CACHE_DIR=/tmp/nexia-composer-cache
+USER 10001:10001
+WORKDIR /workspace
+ENTRYPOINT ["nexia"]
+CMD ["--help"]

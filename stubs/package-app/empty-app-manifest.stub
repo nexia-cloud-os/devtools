@@ -1,0 +1,66 @@
+<?php
+
+declare(strict_types=1);
+
+namespace {{ packageNamespace }};
+
+use Nexia\AppRuntime\AbstractPackageAppManifest;
+use Nexia\Navigation\Contracts\NavigationContribution;
+use Nexia\Navigation\NavigationItem;
+
+final class {{ appName }}AppManifest extends AbstractPackageAppManifest implements NavigationContribution
+{
+    /**
+     * @return list<array{namespace: string, directory: string}>
+     */
+    public function contributionLocations(): array
+    {
+        return [
+            ['namespace' => '{{ packageNamespace }}\\Contribution', 'directory' => __DIR__.'/Contribution'],
+            ['namespace' => '{{ packageNamespace }}\\Descriptors', 'directory' => __DIR__.'/Descriptors'],
+        ];
+    }
+
+    /**
+     * @return list<array{id: string, route: string, permission: string|null, icon: string, sort: int, label_key: string, app_key: string, context_id: string, group_id: string, searchable: bool}>
+     */
+    public static function navigationItems(): array
+    {
+        return [
+            NavigationItem::make(
+                id: '{{ appKey }}',
+                route: '/apps/{{ appKey }}',
+                icon: '{{ appIcon }}',
+                sort: {{ appSort }},
+                labelKey: '{{ appKey }}.overview.title',
+                appKey: '{{ appKey }}',
+                permission: null,
+                contextId: 'app', groupId: null,
+            ),
+        ];
+    }
+
+    public function tenantFilamentResources(): array
+    {
+        return [
+            // nexia:make-package-resource:tenant-filament-resources:end
+        ];
+    }
+
+    public function tenantMigrationPaths(): array
+    {
+        $path = __DIR__.'/../database/migrations/tenant';
+
+        // Source snapshots omit empty directories until the first Resource exists.
+        return is_dir($path) ? [$path] : [];
+    }
+
+    public function pageElementsExtras(): array
+    {
+        return [
+            '/apps/{{ appKey }}' => '{{ appPrefix }}OverviewSurface',
+            // nexia:pages:end
+        ];
+    }
+
+}

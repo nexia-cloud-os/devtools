@@ -1,0 +1,21 @@
+{{ recordImport }}
+import { useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
+import { isHttpError } from '@nexia/sdk';
+import { NxPageFrame, NxButton, NxEmptyView, NxLoadingBlock, useContextQuery } from '@nexia/sdk/host';
+import { {{ pageCamel }}QueryOptions } from './{{ pageSlug }}-queries';
+
+export default function {{ PageName }}Surface() {
+    const { t } = useTranslation();
+    const { data: context } = useContextQuery();
+    const tenantId = context?.tenant?.id;
+    const query = useQuery({ ...{{ pageCamel }}QueryOptions(tenantId ?? ''), enabled: !!tenantId });
+    const status = isHttpError(query.error) ? query.error.response?.status : undefined;
+    return <NxPageFrame currentLabel={t('{{ appKey }}.pages.{{ pageKey }}.title')}>
+        {!tenantId || query.isLoading ? <NxLoadingBlock shape="text" label={t('common.status.loading')} /> : query.isError ?
+            <NxEmptyView kind={status === 403 ? 'permission' : status === 404 ? 'notFound' : 'error'} description={status === 401 ? t('common.errors.unauthenticated') : undefined}>
+                {status !== 403 && status !== 404 ? <NxButton onClick={() => void query.refetch()}>{t('common.actions.retry')}</NxButton> : null}
+            </NxEmptyView> : query.data?.items.length ?
+                <ul>{query.data.items.map(item => <li key={item.id}>{{ recordLink }}</li>)}</ul> : <NxEmptyView kind="empty" />}
+    </NxPageFrame>;
+}

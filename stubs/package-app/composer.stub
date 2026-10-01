@@ -1,0 +1,42 @@
+{
+    "name": "{{ packageComposerName }}",
+    "description": {{ packageDescriptionJson }},
+    "type": "library",
+    "license": "proprietary",
+    "require": {
+        "nexia-cloud-os/sdk-laravel": "^0.7.2"
+    },
+    "require-dev": {
+        "pestphp/pest": "^4.4"
+    },
+    "scripts": {
+        "test": "pest --compact"
+    },
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "{{ packageNamespaceJson }}\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "{{ packageNamespaceJson }}\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-main": "0.1.x-dev"
+        },
+        "laravel": {
+            "providers": [
+                "{{ packageNamespaceJson }}\\{{ appName }}ServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
