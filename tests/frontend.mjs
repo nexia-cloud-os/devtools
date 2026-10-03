@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { mkdtemp, mkdir, readFile, readdir, appendFile, writeFile, rm } from 'node:fs/promises';
+import { mkdtemp, mkdir, readFile, readdir, appendFile, writeFile, rm, symlink } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -16,7 +16,7 @@ try {
         ['make:app', 'FrontendProof', '--vendor=example', '--family=other', `--directory=${app}`],
         ['make:resource', app, 'Note', '--label-ko=노트', '--record-owner=tenant'],
         ['make:resource', app, 'Memo', '--label-ko=메모', '--record-owner=legal_entity'],
-        ['make:page', app, 'WorkSummary', '--label-ko=업무 요약', '--with-record'],
+        ['make:page', app, 'WorkSummary', '--label-ko=업무 요약'],
     ]) execFileSync('php', [tool, ...args, '--no-interaction'], { stdio: 'pipe' });
     const entrySource = await readFile(path.join(app, 'resources/js/index.ts'), 'utf8');
     assert.match(entrySource, /appKey: 'frontend-proof'/);
@@ -261,7 +261,7 @@ try {
         assert.deepEqual(inspectedOptions.queryKey, queryModule.exports.noteDetailQueryOptions('tenant', 'record').queryKey);
         const boundary = panel.props.children[1];
         assert.equal(boundary.type, 'query-boundary');
-        assert.deepEqual(boundary.props.actions().props.actions, []);
+        assert.deepEqual(boundary.props.actions(retained.note).props.children[0].props.actions, []);
         assert.equal(boundary.props.query.error.response.status, status);
     }
     observation = { data: retained };
@@ -298,6 +298,8 @@ try {
     assert(readNodes.includes('detail-row'));
     assert(!readNodes.some(type => ['frame', 'form', 'input', 'button'].includes(type)));
 
+    await mkdir(path.join(app, 'node_modules/@nexia'), { recursive: true });
+    await symlink(fileURLToPath(new URL('../../react', import.meta.url)), path.join(app, 'node_modules/@nexia/sdk'), 'dir');
     await mkdir(path.join(app, 'public'));
     await writeFile(path.join(app, 'public/private.txt'), 'NEXIA_PUBLIC_COPY_SENTINEL');
     await writeFile(path.join(app, '.env'), 'VITE_NEXIA_BUILD_PROBE=NEXIA_ENV_SENTINEL\n');

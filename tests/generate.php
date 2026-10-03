@@ -30,11 +30,16 @@ try {
     $directory = $root.'/acme/leave';
     $composer = json_decode(file_get_contents($directory.'/composer.json'), true, flags: JSON_THROW_ON_ERROR);
     assert($composer['name'] === 'acme/leave');
-    assert($composer['require']['nexia-cloud-os/sdk-laravel'] === '^0.7.2');
+    assert($composer['require']['nexia-cloud-os/sdk-laravel'] === '^0.8.0');
     assert(str_contains(file_get_contents($directory.'/Dockerfile'), 'nexia-cloud-os/devtools:'));
     assert(! isset($composer['require']['nexia/sdk-laravel']));
     assert($composer['autoload']['psr-4'] === ['Nexia\\Apps\\Acme\\LeaveManager\\' => 'src/']);
     assert(! isset($composer['extra']['nexia']));
+    assert(is_file($directory.'/src/Support/DB.php'));
+    assert(is_file($directory.'/src/Support/Schema.php'));
+    assert(str_contains(file_get_contents($directory.'/src/Support/DB.php'), "namespace Nexia\\Apps\\Acme\\LeaveManager\\Support;"));
+    assert(str_contains(file_get_contents($directory.'/src/Support/DB.php'), "public const APP_KEY = 'leave';"));
+    assert(str_contains(file_get_contents($directory.'/src/Support/Schema.php'), 'extends AppSchema'));
     $manifestSource = file_get_contents($directory.'/src/LeaveManagerAppManifest.php');
     preg_match('/public function tenantMigrationPaths\(\): array\s*\{(.*?)\n    \}/s', $manifestSource, $migrationMethod);
     assert(isset($migrationMethod[1]));
@@ -92,7 +97,9 @@ try {
     assert(! file_exists($directory.'/src/Models/Class.php'));
     $run(['make:resource', 'acme/leave', 'Request', '--label-ko=휴가 신청']);
     assert(str_contains(file_get_contents($directory.'/src/Models/Request.php'), 'namespace Nexia\\Apps\\Acme\\LeaveManager\\Models;'));
+    assert(str_contains(file_get_contents($directory.'/src/Models/Request.php'), 'extends NexiaEntityModel'));
     assert(count(glob($directory.'/database/migrations/tenant/*_create_leave_records_requests_table.php')) === 1);
+    assert(str_contains(file_get_contents(glob($directory.'/database/migrations/tenant/*_create_leave_records_requests_table.php')[0]), 'Illuminate\\Support\\Facades\\Schema'));
     assert(! is_dir($directory.'/src/Filament/Tenant/Resources/Requests'));
     assert(file_get_contents($directory.'/src/LeaveManagerAppManifest.php') === $manifest);
     $run(['make:resource', 'acme/leave', 'Request', '--label-ko=휴가 신청', '--with-filament', '--force']);
@@ -305,7 +312,7 @@ try {
     file_put_contents($composerFile, json_encode($legacyComposer, JSON_THROW_ON_ERROR));
     $run(['validate', 'acme/leave'], false);
     unlink($directory.'/nexia.json');
-    $run(['validate', 'acme/leave']); // Existing packages remain usable during migration.
+    assert(str_contains($run(['validate', 'acme/leave'], false), 'extra.nexia is unsupported'));
     file_put_contents($composerFile, json_encode($nativeComposer, JSON_THROW_ON_ERROR));
     file_put_contents($directory.'/nexia.json', '{');
     $run(['validate', 'acme/leave'], false);

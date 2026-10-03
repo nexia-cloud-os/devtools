@@ -229,6 +229,8 @@ class MakePackageApp extends Command
             "{$stubDir}/pest.stub" => "{$packageDir}/tests/Pest.php",
             "{$stubDir}/phpunit.stub" => "{$packageDir}/phpunit.xml",
             "{$stubDir}/empty-app-manifest.stub" => "{$packageDir}/src/{$appName}AppManifest.php",
+            "{$stubDir}/app-database.stub" => "{$packageDir}/src/Support/DB.php",
+            "{$stubDir}/app-schema.stub" => "{$packageDir}/src/Support/Schema.php",
             "{$stubDir}/service-provider.stub" => "{$packageDir}/src/{$appName}ServiceProvider.php",
             "{$stubDir}/descriptor-slot-widgets.stub" => "{$packageDir}/src/Descriptors/{$appName}SlotWidgets.php",
             "{$stubDir}/empty-routes.stub" => "{$packageDir}/routes/routes.php",

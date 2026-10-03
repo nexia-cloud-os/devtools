@@ -10,7 +10,7 @@ COPY --from=node /usr/local/lib/node_modules /usr/local/lib/node_modules
 COPY --from=composer /usr/bin/composer /usr/local/bin/composer
 RUN ln -s /usr/local/lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm
 ARG NEXIA_CLI_VERSION=alpha
-ARG NEXIA_DEVTOOLS_VERSION=^0.1
+ARG NEXIA_DEVTOOLS_VERSION=^0.2
 ENV COMPOSER_HOME=/opt/nexia-composer
 RUN npm install --global --ignore-scripts --no-audit --no-fund "@nexia/cli@${NEXIA_CLI_VERSION}" \
     && composer global require "nexia-cloud-os/devtools:${NEXIA_DEVTOOLS_VERSION}" --no-interaction --no-scripts --no-plugins --prefer-dist \

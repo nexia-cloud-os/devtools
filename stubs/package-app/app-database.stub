@@ -1,0 +1,13 @@
+<?php
+
+declare(strict_types=1);
+
+namespace {{ packageNamespace }}\Support;
+
+use Nexia\Laravel\Database\Facades\AppDatabase;
+
+/** App-owned persistence facade; the host selects its named tenant connection. */
+final class DB extends AppDatabase
+{
+    public const APP_KEY = '{{ appKey }}';
+}

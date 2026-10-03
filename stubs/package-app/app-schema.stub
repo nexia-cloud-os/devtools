@@ -1,0 +1,13 @@
+<?php
+
+declare(strict_types=1);
+
+namespace {{ packageNamespace }}\Support;
+
+use Nexia\Laravel\Database\Facades\AppSchema;
+
+/** App-owned schema facade; the host selects its named tenant connection. */
+final class Schema extends AppSchema
+{
+    public const APP_KEY = '{{ appKey }}';
+}

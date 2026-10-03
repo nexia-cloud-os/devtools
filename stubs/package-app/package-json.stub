@@ -12,14 +12,14 @@
         "#lang/*": "./resources/lang/*"
     },
     "peerDependencies": {
-        "@nexia/sdk": "^0.7.1",
+        "@nexia/sdk": "^0.8.0",
         "@tanstack/react-query": "^5.99.0",
         "react": "^19.1.0",
         "react-i18next": "^17.0.2",
         "react-router-dom": "^7.5.0"
     },
     "devDependencies": {
-        "@nexia/sdk": "^0.7.1",
+        "@nexia/sdk": "^0.8.0",
         "vite": "^7.0.7",
         "vitest": "^4.1.4"
     }

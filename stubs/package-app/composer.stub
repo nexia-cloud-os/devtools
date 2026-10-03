@@ -4,7 +4,7 @@
     "type": "library",
     "license": "proprietary",
     "require": {
-        "nexia-cloud-os/sdk-laravel": "^0.7.2"
+        "nexia-cloud-os/sdk-laravel": "^0.8.0"
     },
     "require-dev": {
         "pestphp/pest": "^4.4"
