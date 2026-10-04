@@ -412,7 +412,7 @@ trait ScaffoldsResource
     protected function printPackageNextSteps(string $appKey, string $exampleResource = 'Invoice'): void
     {
         $this->line('Review the generated domain fields, permissions, migrations and translations.');
-        $this->line('Connect this App with nexia link, then use nexia dev in its directory.');
+        $this->line('Run nexia dev from this App or its connected project.');
         $this->line('Installation and required initialization are managed by the platform.');
     }
 }

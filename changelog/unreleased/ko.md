@@ -5,7 +5,7 @@ status: draft
 
 # 독립 App 개발 도구
 
-- `make:page`와 `nexia make:page`로 Model·migration 없이 Controller·공유 조회 타입·지연 로딩 화면·권한/메뉴 선언을 생성합니다. 업무 조회는 개발자가 구현하며 구현 전에는 501을 반환합니다. 기존 파일이나 등록 삽입 지점 누락은 쓰기 전에 거절합니다.
+- `make:page`와 `nexia make page`로 Model·migration 없이 Controller·공유 조회 타입·지연 로딩 화면·권한/메뉴 선언을 생성합니다. 업무 조회는 개발자가 구현하며 구현 전에는 501을 반환합니다. 기존 파일이나 등록 삽입 지점 누락은 쓰기 전에 거절합니다.
 - Core checkout 없이 기존 Nexia 템플릿으로 App·Resource·선택형 서명 데이터 소스 코드를 생성합니다. vendor와 App 이름으로 `Nexia\Apps\Vendor\AppName`을 만들며 Composer와 프론트 패키지는 `vendor/app-key`, `@vendor/app-key`를 사용합니다.
 - 로컬 검사는 App 코드를 부팅하지 않고 metadata·PSR-4 manifest 경로·PHP 문법을 확인합니다. 런타임·DB·인가 정확성을 증명하는 검사는 아닙니다.
 - App 템플릿에 독립 Pest 설정, 공개 도구만 포함하는 Docker/Compose, 별도 CLI 로그인 저장소, App 파일과 비밀값을 제외하는 build context를 포함합니다. 기존 생성 대상은 덮어쓰지 않습니다.
@@ -28,3 +28,7 @@ status: draft
 - 생성된 앱 안내를 공개 CLI의 `make:*` 명령과 로그인·등록·작업 탭 저장 확인 순서로 맞췄습니다. 의존성 설치 후에는 대응하는 CLI의 `nexia dev`가 로컬·Docker에서 Vite 빌드 감시까지 시작하므로 별도 빌드 터미널이 필요하지 않습니다.
 
 - 생성 앱에 `nexia-php84-v1` 플랫폼 계약을 선언하고 PHP SDK `^0.7.0`과 Core `^0.6.21`을 요구합니다. 계약 초안 단계에서는 대응하는 미출시 SDK/Runtime 소스를 함께 사용해야 하며, 게시된 SDK 0.7.0만으로는 충분하지 않습니다. 기존 앱 식별자는 변경하지 않습니다.
+
+## 공개 CLI 안내
+
+- 생성 앱 안내를 대응 CLI 명령과 프로젝트 전체 개발 흐름에 맞췄습니다. Node CLI가 설정과 확인을 받고 기존 PHP 생성기를 비대화형으로 호출합니다. PHP 생성기 시그니처·소유 범위·번역 fallback·기존 선택형 내부 생성 기능은 유지합니다. 대응 CLI·Developer Docs와 함께 전달하며 이전 공개 명령의 별칭은 제공하지 않습니다.

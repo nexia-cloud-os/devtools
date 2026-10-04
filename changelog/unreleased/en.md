@@ -4,7 +4,7 @@ status: draft
 
 # Standalone App development tools
 
-- Added `make:page` and `nexia make:page`: a Controller, shared query type, lazy screen and permission/navigation declaration without a Model or migration. Implement the business query before use; the scaffold returns 501 until then. Existing files or missing registration markers are rejected before writes.
+- Added `make:page` and `nexia make page`: a Controller, shared query type, lazy screen and permission/navigation declaration without a Model or migration. Implement the business query before use; the scaffold returns 501 until then. Existing files or missing registration markers are rejected before writes.
 
 - Generate App, Resource and opt-in signature data source code using the existing Nexia templates without a Core checkout. Vendor and App name produce `Nexia\Apps\Vendor\AppName`; Composer and frontend packages use `vendor/app-key` and `@vendor/app-key`.
 - Local validation checks metadata, PSR-4 manifest paths and PHP syntax without booting App code. It does not establish runtime, database or authorization correctness.
@@ -28,3 +28,7 @@ status: draft
 - Generated App instructions use the public CLI `make:*` commands and the login, registration and work-tab save verification flow. After dependency installation, the matching CLI's `nexia dev` also watches frontend builds without another terminal.
 
 - Generated Apps declare the `nexia-php84-v1` platform contracts and require PHP SDK `^0.7.0` with Core `^0.6.21`. Use the matching unreleased SDK/Runtime sources while these contracts are in draft; a published SDK 0.7.0 alone is insufficient. Existing App identities are unchanged.
+
+## Public CLI instructions
+
+- Generated App instructions use the matching CLI command vocabulary and project-wide development flow. The Node CLI collects and confirms settings and invokes the existing PHP generators noninteractively. PHP generator signatures, ownership, translation fallback and optional internal generator capabilities are unchanged. Publish with the matching CLI and Developer Docs; old public spellings are not aliases.

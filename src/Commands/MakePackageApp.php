@@ -392,7 +392,7 @@ class MakePackageApp extends Command
     private function printPackageBaselineNextSteps(string $appKey): void
     {
         $this->line('Review docs/README.md, docs/DOMAIN-MODEL.md and docs/PAGES.md in the generated App.');
-        $this->line('Add a resource: nexia make:resource ExampleResource <app-directory> --label-ko 예시');
-        $this->line('In a linked project: run npm install in this App, then nexia dev from the project or App directory. Project dev registers Apps automatically. Standalone Apps still use nexia link and nexia app register.');
+        $this->line('Add a resource: nexia make resource ExampleResource (from the App directory) --label-ko 예시');
+        $this->line('In a linked project: run npm install in this App, then nexia dev from the project or App directory. Project dev registers Apps automatically. For a new standalone App, connect its parent project with nexia connect before starting dev.');
     }
 }

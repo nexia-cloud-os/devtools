@@ -7,12 +7,13 @@ bootstrap, Composer scripts or providers.
 
 ```sh
 nexia setup --devtools
-nexia init leave-manager --name LeaveManager --vendor acme --family people
-nexia make:resource Request leave-manager --label-ko='휴가 신청'
-nexia make:page LeaveCalendar leave-manager --label-ko='휴가 달력'
+nexia create app leave-manager --name LeaveManager --vendor acme --family people
+cd leave-manager
+nexia make resource Request --label-ko='휴가 신청'
+nexia make page LeaveCalendar --label-ko='휴가 달력'
 ```
 
-The first `nexia init` argument selects the directory, here `leave-manager`.
+The first `nexia create app` argument selects the directory, here `leave-manager`.
 PHP namespace: `Nexia\Apps\Acme\LeaveManager`; Composer: `acme/leave-manager`;
 frontend: `@acme/leave-manager`. A directory is a checkout location, not the
 source of an already registered App's identity. Resource generation reads the
@@ -39,7 +40,7 @@ Maintainer source checks use a Composer path repository for `../laravel` in an
 ignored `composer.local.json`, then `COMPOSER=composer.local.json composer test`.
 The source package and public release state are tracked in the workspace plan.
 
-`nexia validate <App directory>` checks metadata, PHP syntax and flat
+`nexia check (from the App directory)` checks metadata, PHP syntax and flat
 `resources/lang/*.json` catalogs without executing App code. It rejects duplicate
 translation keys and non-string values. Cross-locale placeholders and rendered
 labels still need separate checks. Generators reject symlinks in their source
@@ -98,3 +99,7 @@ Business pages include related read/edit routes sharing one lazy RecordSurface b
 Generated PHP/React Apps own menu placement in `nexia.json.navigation`. Each item selects a declared `screen` ID and may set `group`, `subgroup`, `sort`, and `icon`; routes, labels and permissions remain screen-owned. Both generators preflight the menu update and preserve existing placement. `--without-navigation` leaves the screen routable without a menu item. Existing Apps without this field retain their PHP menu until explicitly adopting the JSON list.
 
 Resource generation creates the PHP/React application screens by default. Add `--with-filament` only when you also need Filament administration screens. Omitting that option, including during `--force` regeneration, preserves existing administration files and their manifest registration.
+
+## Public CLI input
+
+Use `nexia create app`, `nexia make resource` and `nexia make page`. The Node CLI collects missing settings, validates supplied options and confirms the plan, then invokes this independently installed PHP generator with `--no-interaction`. PHP command signatures and standalone generator features remain available to their existing callers; they are not compatibility aliases in the public CLI. Translation, ownership and generated runtime contracts are unchanged.

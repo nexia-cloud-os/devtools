@@ -9,72 +9,57 @@ the Nexia Sandbox; this repository contains no Core installation.
 
 ## Connect and run
 
-Create a project and prepare its sandbox at https://developers.nexia.to.
-From this App directory, use the public CLI:
+This App belongs in an immediate child folder of a Nexia project. From the parent
+project folder, run `nexia connect <project-id>` and approve in the browser. From
+this App, install dependencies and create your first resource:
 
 ```sh
-nexia login <project-id>
-nexia link
-nexia make:resource Note --label-ko '메모'
-nexia app register
 composer install --no-scripts
 npm install
+nexia make resource Note --label-ko '메모'
 nexia dev
 ```
 
-Login opens a browser on a local interactive terminal; otherwise open its printed
-URL to approve the project connection. Keep dev running and open its workspace
-URL. Open Notes in a work tab, save a record, and reopen it to confirm persistence.
-`nexia dev` builds and watches React screens through the installed Vite tool.
-Use `nexia make:page ExamplePage --label-ko '예시'` for a page without a resource.
+`dev` watches the entire project even from an App subdirectory. Use `--app` to
+select one App. It registers identities, prepares the personal sandbox, syncs
+source and watches React builds. All Apps share one port. `nexia login` renews
+project authentication without changing bindings. Missing creation settings are
+prompted; options skip matching questions. `--no-interactive --yes` is available
+for explicit automation, not for bypassing platform approval.
 
-`link` chooses the project, `app register` registers identity, and `dev` runs this
-App. Registration does not publish or install it. Use a separate dev terminal and
-port for each App; `nexia apps list` lists the project's registered Apps.
-After preparation, open **Development → Project Apps → Test permissions** in the console. Grant Note read, create and update permissions. Select a legal entity only when the App declares legal-entity-scoped permissions. Grants are explicit and expire with the sandbox. Refresh an already open App tab.
-
-Review generated fields, permissions, migrations and translations before
-submitting an immutable version for review.
-
-For a local or separately operated platform only, set
-`nexia config endpoint <URL>` before login. This clears the previous connection.
+Open the printed workspace URL. Grant the App's test read/create/update
+permissions in Developers, save a record and reopen it to verify persistence.
+Registration grants no business access. `nexia make page ExamplePage` adds a page
+without creating a model or migration; implement its business query.
 
 ## Docker tools
 
-Use the generated Dockerfile and Compose service when PHP/Node are not installed
-on the host. On macOS/Linux set `NEXIA_UID` and `NEXIA_GID` to `id -u` and `id -g`
-so generated files belong to you. On Windows omit those variables.
+The generated Dockerfile and Compose service retain the App tooling environment.
+Set NEXIA_UID/NEXIA_GID on macOS/Linux to your user/group IDs when needed.
 
 ```sh
-docker compose build
-docker compose run --rm dev login <project-id>
-docker compose run --rm dev link
-docker compose run --rm dev app register
-docker compose run --rm dev make:resource ExampleResource --label-ko 예시
-docker compose run --rm --entrypoint npm dev install
-docker compose up
+docker compose build dev
+docker compose run --rm --service-ports --entrypoint sh dev
 ```
 
-For an alternate platform, run `docker compose run --rm dev config endpoint <URL>`
-before Docker login; the host CLI connection is separate. After preparation,
-grant the generated resource test permissions in the console, open the workspace
-URL, and save/reopen a record.
-
-The image contains public CLI/SDK/devtools only. The App is mounted at runtime;
-its files and secrets are excluded from the image build context. Docker login
-uses a private per-user directory in the named volume. Do not copy credentials
-from the host or remove the login volume merely to restart a command.
-
+Inside the container, install App dependencies and use `nexia login <project-id>`.
+Open the printed URL manually. A registered standalone App can run
+`nexia dev --container`. For a new App, register through project `dev` first or
+mount/connect the complete project with its Apps. An unregistered App-only mount
+is not a project workspace. Credentials remain private in the container volume;
+do not copy them from the host or remove the volume to restart development.
+An operator-supplied alternate origin can be selected using NEXIA_ENDPOINT before
+login/connection; an existing project keeps its bound origin.
 
 ## Checks
 
 ```sh
-nexia validate
+nexia check
 composer install --no-scripts
 composer test
 ```
 
-`nexia validate` parses source without running App code. The generated resource
+`nexia check` parses source without running App code. The generated resource
 test checks its authorization declaration; add App-owned behavior tests for
 real data and permissions. Composer tests execute your App test code. Do not
 point local tests at a tenant database. Core's test classes are not dependencies.
@@ -86,7 +71,7 @@ lazy surface chunks and a Vite manifest. SDK/React peers remain external for the
 Nexia host; this output is not a standalone HTML preview. The build does not load
 `.env` files or copy `public/`. Import browser assets explicitly from frontend
 source. Never import secrets or PHP files. Building executes your Vite config
-and dependencies; it is separate from the non-executing `nexia validate` check.
+and dependencies; it is separate from the non-executing `nexia check` check.
 
 With Docker, install in the same mounted App directory using
 `docker compose run --rm --entrypoint npm dev install`. Keep the generated
@@ -95,4 +80,12 @@ Without changing your global npm installation, run
 `npm exec --yes --package=npm@11.6.2 -- npm install` to create the lock.
 The generated Docker image already includes this npm version.
 
-Resource generation creates the PHP/React application screens by default. Add `--with-filament` only when you also need Filament administration screens. Omitting that option, including during `--force` regeneration, preserves existing administration files and their manifest registration.
+Resource generation creates PHP/React application screens. The public CLI does
+not expose force-overwrite or Filament generation options. Existing PHP devtools
+capabilities remain available to their existing callers.
+
+Before submission, commit/push source and a version tag with Git. Run
+`nexia check`, `nexia submit --tag v1.0.0`, then `nexia submit status <id>`.
+Repository connection is requested in Developers when needed. Submission is not
+publication or installation. For App database work use `nexia db migrate`,
+`nexia db seed`, and `nexia db status`; queued does not mean completed.

@@ -12,7 +12,7 @@ Repository rules for the `{{ appKey }}` Nexia App Package.
   frontend contracts from `@nexia/sdk`. Do not import Core or another App.
 - Preserve the Composer PSR-4 namespace and registered App identity. Use
   Resource References, public contracts and declared events for cross-App work.
-- Use `nexia link` and `nexia dev` for the operator-managed Sandbox. Keep
+- Use `nexia login` and project `nexia dev` for the operator-managed Sandbox. Keep
   secrets and server code outside public/. Never request login tokens in chat.
 - Keep required installation data in this App's initializer; sample data is
   separate. Do not run other Apps' seeders or edit their migrations.
