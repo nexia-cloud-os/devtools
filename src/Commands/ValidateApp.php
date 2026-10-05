@@ -78,9 +78,16 @@ final class ValidateApp extends Command
                         continue;
                     }
                     try {
-                        token_get_all(file_get_contents($file->getPathname()), TOKEN_PARSE);
+                        $tokens = token_get_all(file_get_contents($file->getPathname()), TOKEN_PARSE);
                     } catch (\ParseError) {
                         throw new RuntimeException('Invalid PHP syntax: '.substr($file->getPathname(), strlen($root) + 1));
+                    }
+                    // Inspect code tokens only; comments and examples must not trigger diagnostics.
+                    $code = implode('', array_map(static fn ($token) => is_array($token)
+                        ? (in_array($token[0], [T_WHITESPACE, T_COMMENT, T_DOC_COMMENT], true) ? ''
+                            : ($token[0] === T_CONSTANT_ENCAPSED_STRING ? "\0" : $token[1])) : $token, $tokens));
+                    if (preg_match('/(?:\$request(?:->|\?->)user\(\)|auth\(\)(?:->|\?->)user\(\))(?:->|\?->)getKey\(/', $code)) {
+                        throw new RuntimeException('Authenticated users are not Eloquent models: '.substr($file->getPathname(), strlen($root) + 1).'. Use getAuthIdentifier() on the authenticated user; use key() for SDK Actor.');
                     }
                     $checked[$file->getPathname()] = true;
                 }

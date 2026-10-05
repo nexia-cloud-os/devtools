@@ -21,6 +21,25 @@ Repository rules for the `{{ appKey }}` Nexia App Package.
 - Report missing SDK/platform capabilities through developer-support. Prepare
   sanitized reports for developer review before submission.
 
+## Read before implementation
+
+- Read the public SDK guide and permission guide before changing platform calls:
+  https://developers.nexia.to/docs/app-sdk-sdk-contracts
+  https://developers.nexia.to/docs/architecture-permissions-and-roles
+- For an authenticated Laravel request use `$request->user()->getAuthIdentifier()`.
+  For `Nexia\Identity\Contracts\Actor` use `$actor->key()`. Never assume the
+  actor is a Core Eloquent model. App-owned model records may still use `getKey()`.
+- Match frontend permission queries to the Resource scope. A tenant permission
+  result cannot replace Legal Entity or Operating Unit authorization. Keep the
+  backend Policy authoritative and distinguish loading from denied access.
+- After saving, show the successful API result or invalidate the relevant query.
+  An uncertain response is not a failed write: use the host save-result recovery
+  before retrying. Do not implement automatic duplicate submissions.
+- At validation time run `nexia check` first, then verify one permitted and one
+  denied operation and the saved result in the sandbox. Static checks do not
+  prove runtime permissions or persistence. Report the file, command, sanitized
+  error and what remains unverified; do not patch host internals to make a test pass.
+
 ## Organization scope UI
 
 - Put page-owned organization scope in the Route Surface `organizationScope`

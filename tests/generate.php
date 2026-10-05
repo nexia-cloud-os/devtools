@@ -305,6 +305,22 @@ try {
     assert($snapshot($directory) === $before);
     $run([...$sourceArgs, "--label-key=leave.bad'key", '--write', '--force'], false);
     $run(['validate', 'acme/leave']);
+    $actorProbe = $directory.'/src/ActorProbe.php';
+    foreach (['$request->user()->getKey()', '$request /* actor */ -> user()?->getKey()', 'auth()->user()->getKey()'] as $expression) {
+        file_put_contents($actorProbe, '<?php function actorProbe($request) { return '.$expression.'; }');
+        $diagnostic = $run(['validate', 'acme/leave'], false);
+        assert(str_contains($diagnostic, 'src/ActorProbe.php') && str_contains($diagnostic, 'getAuthIdentifier()'));
+    }
+    file_put_contents($actorProbe, <<<'PHP'
+<?php
+// $request->user()->getKey() is an example of the rejected pattern.
+function actorProbe($request, $record, $actor) {
+    $example = '$request->user()->getKey()';
+    return [$request->user()->getAuthIdentifier(), $record->getKey(), $actor->key()];
+}
+PHP);
+    $run(['validate', 'acme/leave']);
+    unlink($actorProbe);
     $nativeComposer = json_decode(file_get_contents($composerFile), true, flags: JSON_THROW_ON_ERROR);
     $nativeManifest = json_decode(file_get_contents($directory.'/nexia.json'), true, flags: JSON_THROW_ON_ERROR);
     $legacyComposer = $nativeComposer;
