@@ -64,6 +64,23 @@ Repository rules for the `{{ appKey }}` Nexia App Package.
   Do not add a frontend Information Schema or duplicate owner selectors.
 
 
+## Query performance
+
+- Keep App-owned SQL and business dependency checks in the App; report shared
+  SDK/host overhead to the platform owner instead of bypassing its checks.
+- Authorize and filter before pagination. For list enrichment, batch only the
+  authorized page's IDs with eager loading, aggregates or EXISTS as appropriate;
+  do not add SQL or host callbacks per row in serializers. Use existing public
+  batch contracts when available; never query Core or another App's tables.
+- Preserve tenant/actor/organization scope and soft-delete semantics. List flags
+  are display results, not write authority: mutations recheck current permission
+  and dependencies. Never cache actor decisions across requests to gain speed.
+- At finalization, cover several distinct rows, empty results and changed
+  dependencies; assert query/callback growth stays bounded for the changed path.
+  Compare the same data, actor scope and page size; distinguish cold/warm runs,
+  App SQL, host callbacks, full HTTP and browser time. See
+  https://developers.nexia.to/docs/building-apps-test-an-app for measurement guidance.
+
 ## Safety
 
 - Tenant data and execution remain isolated.
