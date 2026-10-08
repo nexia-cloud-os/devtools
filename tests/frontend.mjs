@@ -18,6 +18,8 @@ try {
         ['make:resource', app, 'Memo', '--label-ko=메모', '--record-owner=legal_entity'],
         ['make:page', app, 'WorkSummary', '--label-ko=업무 요약'],
     ]) execFileSync('php', [tool, ...args, '--no-interaction'], { stdio: 'pipe' });
+    const packageJson = JSON.parse(await readFile(path.join(app, 'package.json'), 'utf8'));
+    assert.equal(packageJson.devDependencies['@nexia/sdk'], '^0.8.2');
     const entrySource = await readFile(path.join(app, 'resources/js/index.ts'), 'utf8');
     assert.match(entrySource, /appKey: 'frontend-proof'/);
     assert(entrySource.includes("resourceContracts: import.meta.glob('./resources/*/*-resource-contract.ts')"));
@@ -316,6 +318,8 @@ try {
     const files = await readdir(output, { recursive: true });
     assert(!files.some(file => /\.(?:map|php)$/.test(file) || file === 'private.txt'));
     const javascript = (await Promise.all(files.filter(file => file.endsWith('.js')).map(file => readFile(path.join(output, file), 'utf8')))).join('\n');
+    assert.match(javascript, /modulepreload/, 'Lazy dependency preloading must survive the actual App build');
+    assert.match(javascript, /import\.meta\.url/, 'Preloads must resolve relative to the authenticated App asset URL');
     assert.match(javascript, /@nexia\/sdk\/host/);
     assert.match(javascript, /react\/jsx-runtime/);
     assert.doesNotMatch(javascript, /NEXIA_ENV_SENTINEL|NEXIA_PUBLIC_COPY_SENTINEL|import\.meta\.glob|#app\//);

@@ -64,6 +64,21 @@ Repository rules for the `{{ appKey }}` Nexia App Package.
   Do not add a frontend Information Schema or duplicate owner selectors.
 
 
+## Frontend build performance
+
+- Use `nexiaAppConfig(import.meta.url)` from `@nexia/sdk/vite` with build SDK
+  0.8.2 or later. Keep route/widget surfaces lazy and host-provided peers external.
+- Extend the shared configuration instead of replacing its build contract. Keep
+  relative asset URLs, dependency preloading and the host compatibility manifest;
+  Vite library mode disables the default lazy dependency preloading.
+- Rebuild and publish after upgrading the build SDK; assembling a shared runtime
+  image does not rebuild reviewed frontend assets. Existing lockfiles must resolve
+  the upgraded SDK, not merely declare a compatible range.
+- Check the built entry and lazy dependency graph, then measure first entry,
+  within-App and cross-App navigation separately. A successful build or a visible
+  heading does not prove that business data is ready. Do not eagerly bundle every
+  screen or cache permission decisions to hide request overhead.
+
 ## Query performance
 
 - Keep App-owned SQL and business dependency checks in the App; report shared

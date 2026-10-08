@@ -51,13 +51,23 @@ For a local install without changing global tools, use
 `npm exec --yes --package=npm@11.6.2 -- npm install`. Generated Docker images include npm 11.6.2.
 `dist/frontend` contains ES modules, lazy chunks and a Vite manifest; SDK/React
 peers are supplied by the host. The build is separate from source validation.
+The shared `nexiaAppConfig(import.meta.url)` build uses SDK 0.8.2 or later to
+preload lazy surfaces and their dependencies in parallel. Keep its relative asset
+URLs, external host peers and `nexia-host.json` contract when extending Vite.
+Do not switch to library mode, which disables Vite's default dependency preloading.
+Existing Apps must update their resolved build SDK and rebuild/publish; shared-image
+assembly only packages reviewed artifacts and cannot optimize old bundles.
+Keep the runtime peer minimum separate from the build tool minimum: this update
+does not require a new host API.
 Generated Docker Compose runs `nexia dev --container` and publishes the preview
 only on host loopback. Set `NEXIA_PORT` to a different port for each App when
 running several Apps concurrently (default 4310). Build frontend assets before
 starting the preview; the CLI never runs App build scripts automatically.
 To reproduce the generator-to-build check with an installed Vite 7 CLI:
 `node tests/frontend.mjs /absolute/path/to/vite/bin/vite.js`. It generates and
-removes its own App; it does not verify a browser host or published dependencies.
+removes its own App and checks lazy chunks, dependency preloading and host peers.
+CI runs this check for both React SDK and generator changes. It does not verify a
+browser host or published dependencies; measure business-data readiness separately.
 
 New Laravel Apps declare identity, Core compatibility and test paths in
 `nexia.json` (schema_version "2", runtime "laravel"). Composer owns PHP
