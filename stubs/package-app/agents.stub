@@ -87,6 +87,14 @@ Repository rules for the `{{ appKey }}` Nexia App Package.
   authorized page's IDs with eager loading, aggregates or EXISTS as appropriate;
   do not add SQL or host callbacks per row in serializers. Use existing public
   batch contracts when available; never query Core or another App's tables.
+- Host identities are SDK interfaces, not Eloquent models. Use `Party::publicId()` /
+  `displayLabel()`; use `BatchPersonProfileDirectory` for page-wide person profile
+  fields such as `legalName`. Test against interface-only doubles and distinct
+  profiles so raw model properties and per-row lookups fail in local checks.
+- For status/count flags, use bounded aggregates or EXISTS instead of hydrating
+  all child records. Test date boundaries and lifecycle precedence against detail results.
+- Measure full pages with skewed child counts. If correlated EXISTS repeatedly
+  scans a child table, group flags once for the authorized page IDs.
 - Preserve tenant/actor/organization scope and soft-delete semantics. List flags
   are display results, not write authority: mutations recheck current permission
   and dependencies. Never cache actor decisions across requests to gain speed.
@@ -119,3 +127,5 @@ PR/MR and describe related Core/SDK/App changes and their merge order. Creating
 a PR/MR does not authorize merging it; merge requires explicit user approval.
 Do not weaken branch protection. Core, SDK, and App developers follow the same
 workflow; no developer-specific local policy file is required.
+
+For exact-self Resource References, opt into `ResourceReferenceSelfServiceContribution` only when every supported read method restricts records to the restored actor and organization. Admit explicit purposes; test other actors, organizations, forged IDs/filters/dates and revoked source authority. Never infer self authority from a request body flag. See the Resource References developer guide.
