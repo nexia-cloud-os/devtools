@@ -30,7 +30,7 @@ try {
     $directory = $root.'/acme/leave';
     $composer = json_decode(file_get_contents($directory.'/composer.json'), true, flags: JSON_THROW_ON_ERROR);
     assert($composer['name'] === 'acme/leave');
-    assert($composer['require']['nexia-cloud-os/sdk-laravel'] === '^0.8.0');
+    assert($composer['require']['nexia-cloud-os/sdk-laravel'] === '^0.9.0');
     assert(str_contains(file_get_contents($directory.'/Dockerfile'), 'nexia-cloud-os/devtools:'));
     assert(! isset($composer['require']['nexia/sdk-laravel']));
     assert($composer['autoload']['psr-4'] === ['Nexia\\Apps\\Acme\\LeaveManager\\' => 'src/']);
