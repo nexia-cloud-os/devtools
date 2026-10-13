@@ -23,7 +23,7 @@ status: draft
 - Resource generation validates planned source files, manifest/route insertion points and translation catalogs before writing. Invalid registration markers or catalogs leave existing App files unchanged. The unused frontend inspector marker is no longer required. Later filesystem failures are not rolled back automatically.
 - Generated detail and edit surfaces distinguish forbidden, missing records and query failures instead of inferring permission from absent data. Failed initial loads offer retry where appropriate; transient refresh failures preserve existing content, while 401/403/404 remove stale content. Adopt the generated query-state handling in existing screens; no server authorization policy changes.
 
-- New App entries supply their App key and lazily discovered resource contracts to the host. The unused frontend inspector marker is no longer generated. Existing Apps can add `resourceContracts: import.meta.glob('./resources/*/*-resource-contract.ts')` to their surface registration after updating Core and the React SDK together.
+- Generated App entries share eagerly discovered resource contracts between Inspector and surface registration, avoiding mixed static/dynamic imports of those contracts while keeping screens lazy. Resource generation upgrades recognized older generated registrations; custom entries are preserved. Existing custom entries can adopt the shared contract map from the App template without changing individual resource screens or requiring a new runtime SDK API.
 
 - Generated App instructions use the public CLI `make:*` commands and the login, registration and work-tab save verification flow. After dependency installation, the matching CLI's `nexia dev` also watches frontend builds without another terminal.
 

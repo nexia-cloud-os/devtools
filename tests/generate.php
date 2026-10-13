@@ -120,12 +120,30 @@ try {
 
     $entryPath = $directory.'/resources/js/index.ts';
     $entry = file_get_contents($entryPath);
-    $legacyEntry = str_replace("    import.meta.glob('./resources/*/*-resource-contract.ts', { eager: true }),\n", '', $entry);
-    file_put_contents($entryPath, $legacyEntry);
-    $run(['make:resource', 'acme/leave', 'WorkEntry', '--label-ko=작업 항목', '--dry-run']);
-    assert(file_get_contents($entryPath) === $legacyEntry);
-    $run(['make:resource', 'acme/leave', 'WorkEntry', '--label-ko=작업 항목']);
-    assert(file_get_contents($entryPath) === $entry);
+    $contractDeclaration = "const resourceContractModules = import.meta.glob('./resources/*/*-resource-contract.ts', { eager: true });\n\n";
+    $sharedContracts = "resourceContracts: Object.fromEntries(\n        Object.entries(resourceContractModules).map(([path, module]) => [path, async () => module]),\n    )";
+    assert(str_contains($entry, $contractDeclaration));
+    assert(str_contains($entry, $sharedContracts));
+    foreach (['', "    import.meta.glob('./resources/*/*-resource-contract.ts', { eager: true }),\n"] as $legacyInspectorContracts) {
+        $legacyEntry = str_replace(
+            [$contractDeclaration, "    resourceContractModules,\n", $sharedContracts],
+            ['', $legacyInspectorContracts, "resourceContracts: import.meta.glob('./resources/*/*-resource-contract.ts')"],
+            $entry,
+        );
+        file_put_contents($entryPath, $legacyEntry);
+        $run(['make:resource', 'acme/leave', 'WorkEntry', '--label-ko=작업 항목', '--force', '--dry-run']);
+        assert(file_get_contents($entryPath) === $legacyEntry);
+        $run(['make:resource', 'acme/leave', 'WorkEntry', '--label-ko=작업 항목', '--force']);
+        assert(file_get_contents($entryPath) === $entry);
+    }
+    $run(['make:resource', 'acme/leave', 'WorkEntry', '--label-ko=작업 항목', '--force']);
+    assert(file_get_contents($entryPath) === $entry); // Repeated generation is idempotent.
+    foreach (["// App-owned entry\n", "const resourceContractModules = {};\n".$legacyEntry] as $customEntry) {
+        file_put_contents($entryPath, $customEntry);
+        $run(['make:resource', 'acme/leave', 'WorkEntry', '--label-ko=작업 항목', '--force']);
+        assert(file_get_contents($entryPath) === $customEntry);
+    }
+    file_put_contents($entryPath, $entry);
     $inspector = $directory.'/resources/js/resources/work-entries/inspector/WorkEntryInspector.tsx';
     assert(! file_exists($inspector));
     $contract = $directory.'/resources/js/resources/work-entries/work-entry-resource-contract.ts';

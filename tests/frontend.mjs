@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 import { mkdtemp, mkdir, readFile, readdir, appendFile, writeFile, rm, symlink } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
@@ -22,7 +22,7 @@ try {
     assert.equal(packageJson.devDependencies['@nexia/sdk'], '^0.8.2');
     const entrySource = await readFile(path.join(app, 'resources/js/index.ts'), 'utf8');
     assert.match(entrySource, /appKey: 'frontend-proof'/);
-    assert(entrySource.includes("resourceContracts: import.meta.glob('./resources/*/*-resource-contract.ts')"));
+    assert(entrySource.includes('resourceContracts: Object.fromEntries('));
     // Execute the actual generated detail component with controlled query observations.
     // This checks branch/retry behavior; browser layout remains a separate acceptance check.
     const { transformSync } = createRequire(vite)('esbuild');
@@ -306,7 +306,10 @@ try {
     await writeFile(path.join(app, 'public/private.txt'), 'NEXIA_PUBLIC_COPY_SENTINEL');
     await writeFile(path.join(app, '.env'), 'VITE_NEXIA_BUILD_PROBE=NEXIA_ENV_SENTINEL\n');
     await appendFile(path.join(app, 'resources/js/index.ts'), '\nconsole.log(import.meta.env.VITE_NEXIA_BUILD_PROBE);\n');
-    execFileSync(process.execPath, [vite, 'build'], { cwd: app, stdio: 'pipe' });
+    const build = spawnSync(process.execPath, [vite, 'build'], { cwd: app, encoding: 'utf8' });
+    if (build.error) throw build.error;
+    assert.equal(build.status, 0, `${build.stdout}\n${build.stderr}`);
+    assert.doesNotMatch(`${build.stdout}\n${build.stderr}`, /-resource-contract\.ts[^\n]*dynamically imported/, 'Resource contracts must not mix eager and dynamic imports');
     const output = path.join(app, 'dist/frontend');
     const manifest = JSON.parse(await readFile(path.join(output, '.vite/manifest.json'), 'utf8'));
     assert.equal(manifest['resources/js/index.ts'].isEntry, true);

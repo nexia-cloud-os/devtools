@@ -3,9 +3,11 @@ import {
     autoRegisterPackageSurfaces,
 } from '@nexia/sdk/host';
 
+const resourceContractModules = import.meta.glob('./resources/*/*-resource-contract.ts', { eager: true });
+
 autoRegisterPackageResourceInspectors(
     import.meta.glob('./resources/*/inspector/register-*-inspector.ts', { eager: true }),
-    import.meta.glob('./resources/*/*-resource-contract.ts', { eager: true }),
+    resourceContractModules,
 );
 
 autoRegisterPackageSurfaces({
@@ -13,7 +15,9 @@ autoRegisterPackageSurfaces({
     appKey: '{{ appKey }}',
     overview: () => import('./overview/{{ appPrefix }}OverviewSurface'),
     surfaces: import.meta.glob('./resources/*/surface/*Surface.tsx'),
-    resourceContracts: import.meta.glob('./resources/*/*-resource-contract.ts'),
+    resourceContracts: Object.fromEntries(
+        Object.entries(resourceContractModules).map(([path, module]) => [path, async () => module]),
+    ),
     overrides: {
         // nexia:pages:end
     },

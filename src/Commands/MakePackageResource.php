@@ -530,17 +530,25 @@ class MakePackageResource extends Command
 
             return false;
         }
-        // Upgrade only the exact previously generated call, preserving custom entries.
+        // Upgrade only exact generated registrations; custom entries remain App-owned.
         $previous = "autoRegisterPackageResourceInspectors(\n    import.meta.glob('./resources/*/inspector/register-*-inspector.ts', { eager: true }),\n);";
-        $current = "autoRegisterPackageResourceInspectors(\n    import.meta.glob('./resources/*/inspector/register-*-inspector.ts', { eager: true }),\n    import.meta.glob('./resources/*/*-resource-contract.ts', { eager: true }),\n);";
-        if (str_contains($source, $previous)) {
-            $this->line('  Update generated Inspector registration to include resource contracts.');
-            if (! $dryRun && file_put_contents($path, str_replace($previous, $current, $source)) === false) {
+        $eager = "autoRegisterPackageResourceInspectors(\n    import.meta.glob('./resources/*/inspector/register-*-inspector.ts', { eager: true }),\n    import.meta.glob('./resources/*/*-resource-contract.ts', { eager: true }),\n);";
+        $current = "const resourceContractModules = import.meta.glob('./resources/*/*-resource-contract.ts', { eager: true });\n\nautoRegisterPackageResourceInspectors(\n    import.meta.glob('./resources/*/inspector/register-*-inspector.ts', { eager: true }),\n    resourceContractModules,\n);";
+        $lazyContracts = "resourceContracts: import.meta.glob('./resources/*/*-resource-contract.ts')";
+        $sharedContracts = "resourceContracts: Object.fromEntries(\n        Object.entries(resourceContractModules).map(([path, module]) => [path, async () => module]),\n    )";
+        if (str_contains($source, $current)) {
+            return true;
+        }
+        if ((str_contains($source, $previous) || str_contains($source, $eager))
+            && ! str_contains($source, 'resourceContractModules')) {
+            $this->line('  Update generated registration to share resource contracts.');
+            $updated = str_replace([$previous, $eager, $lazyContracts], [$current, $current, $sharedContracts], $source);
+            if (! $dryRun && file_put_contents($path, $updated) === false) {
                 $this->error('Could not update App Inspector registration.');
 
                 return false;
             }
-        } elseif (! str_contains($source, $current) && $dryRun) {
+        } elseif ($dryRun) {
             $this->warn('Custom frontend entry: register the generated resourceInspector declaration through autoRegisterPackageResourceInspectors or your existing registration code. The entry was preserved.');
         }
 
