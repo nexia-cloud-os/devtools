@@ -28,6 +28,15 @@ try {
     assert(! file_exists($root.'/acme'));
     $run(['make:app', 'LeaveManager', '--vendor=acme', '--family=people', '--key=leave', '--table-prefix=leave_records']);
     $directory = $root.'/acme/leave';
+    $instructions = file_get_contents($directory.'/AGENTS.md');
+    assert(str_contains($instructions, '# leave App'));
+    assert(str_contains($instructions, 'docs/README.md'));
+    assert(str_contains($instructions, 'nexia docs search "topic"'));
+    assert(str_contains($instructions, 'https://developers.nexia.to/docs/getting-started-agent-assisted-development'));
+    assert(! str_contains($instructions, 'NxOrganizationTargetSelector'));
+    file_put_contents($directory.'/AGENTS.md', "Developer-owned App rules\n");
+    $run(['make:app', 'LeaveManager', '--key=leave', '--directory=acme/leave', '--repository-files-only']);
+    assert(file_get_contents($directory.'/AGENTS.md') === "Developer-owned App rules\n");
     $composer = json_decode(file_get_contents($directory.'/composer.json'), true, flags: JSON_THROW_ON_ERROR);
     assert($composer['name'] === 'acme/leave');
     assert($composer['require']['nexia-cloud-os/sdk-laravel'] === '^0.9.0');
