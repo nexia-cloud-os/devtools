@@ -20,6 +20,17 @@ implementation conventions, and focused checks as they are established.
 Keep shared Nexia guidance in the official documentation instead of copying it
 here. This file belongs to the App developer after generation.
 
+## Translation catalogs
+
+- Keep `resources/lang/<locale>.json` flat with string values. Each value may
+  contain at most 2,000 Unicode characters, including descriptions. Use
+  `nexia check` at validation time to locate the file, key and length violations.
+- The exported runtime catalog is limited to 1 MiB, 20 locales and 1,000 exported
+  keys per locale. See the official localization guide for the shared contract:
+  https://developers.nexia.to/docs/building-apps-localize-an-app
+- Fix `CATALOG_VALIDATION_FAILED` declarations before retrying. Follow the
+  operation's retry/review status; never delete `.nexia` or reset data to bypass it.
+
 ## Validation and delivery
 
 - Use the checks documented in README.md. At validation time, start with

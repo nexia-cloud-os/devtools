@@ -32,3 +32,7 @@ status: draft
 ## Public CLI instructions
 
 - Generated App instructions use the matching CLI command vocabulary and project-wide development flow. The Node CLI collects and confirms settings and invokes the existing PHP generators noninteractively. PHP generator signatures, ownership, translation fallback and optional internal generator capabilities are unchanged. Publish with the matching CLI and Developer Docs; old public spellings are not aliases.
+
+## Catalog translation validation
+
+- Translation values support up to 2,000 Unicode characters, including descriptions. Use matching SDK/devtools and Core versions; local `nexia check` reports the affected file, key and lengths.

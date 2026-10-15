@@ -332,6 +332,21 @@ try {
     assert($snapshot($directory) === $before);
     $run([...$sourceArgs, "--label-key=leave.bad'key", '--write', '--force'], false);
     $run(['validate', 'acme/leave']);
+    $localeFile = $directory.'/resources/lang/en.json';
+    $localeBefore = file_get_contents($localeFile);
+    $locale = json_decode($localeBefore, true, flags: JSON_THROW_ON_ERROR);
+    foreach ([272, 2000, 2001] as $length) {
+        $locale['leave.validation.description'] = str_repeat('가', $length);
+        file_put_contents($localeFile, json_encode($locale, JSON_THROW_ON_ERROR));
+        $diagnostic = $run(['validate', 'acme/leave'], $length <= 2000);
+        if ($length > 2000) {
+            assert(str_contains($diagnostic, 'resources/lang/en.json'));
+            assert(str_contains($diagnostic, 'leave.validation.description'));
+            assert(str_contains($diagnostic, '2001 characters; maximum 2000'));
+            assert(! str_contains($diagnostic, str_repeat('가', 20)));
+        }
+    }
+    file_put_contents($localeFile, $localeBefore);
     $actorProbe = $directory.'/src/ActorProbe.php';
     foreach (['$request->user()->getKey()', '$request /* actor */ -> user()?->getKey()', 'auth()->user()->getKey()'] as $expression) {
         file_put_contents($actorProbe, '<?php function actorProbe($request) { return '.$expression.'; }');

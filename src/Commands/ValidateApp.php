@@ -98,7 +98,17 @@ final class ValidateApp extends Command
                 if (is_link($file) || $resolved === false || ! str_starts_with($resolved, $root.'/')) {
                     throw new RuntimeException('Translation catalogs must remain inside this App.');
                 }
-                $this->decodeFlatTranslationCatalog(file_get_contents($file), $file);
+                $translations = $this->decodeFlatTranslationCatalog(file_get_contents($file), $file);
+                foreach ($translations as $key => $value) {
+                    $length = mb_strlen($value, 'UTF-8');
+                    if ($length > 2000) {
+                        throw new RuntimeException(sprintf(
+                            '%s: translation %s has %d characters; maximum %d. Shorten the value before nexia dev.',
+                            'resources/lang/'.basename($file), json_encode($key, JSON_THROW_ON_ERROR),
+                            $length, 2000,
+                        ));
+                    }
+                }
             }
             $this->info("{$definition->appKey}: metadata and ".count($checked).' PHP source files are valid.');
             $this->line(count($catalogs).' flat translation catalogs are valid.');
