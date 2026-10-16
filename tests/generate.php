@@ -28,6 +28,18 @@ try {
     assert(! file_exists($root.'/acme'));
     $run(['make:app', 'LeaveManager', '--vendor=acme', '--family=people', '--key=leave', '--table-prefix=leave_records']);
     $directory = $root.'/acme/leave';
+    $workflow = file_get_contents($directory.'/.github/workflows/ci.yml');
+    assert(str_contains($workflow, 'run: composer test'));
+    assert(str_contains($workflow, 'run: npm run build'));
+    assert(str_contains($workflow, 'run: npm test'));
+    foreach (['tests/Unit/AppManifestTest.php', 'vitest.config.mjs', 'tests/frontend/setup.ts', 'resources/js/overview/LeaveOverviewSurface.test.tsx'] as $testFile) {
+        assert(is_file($directory.'/'.$testFile));
+    }
+    assert(! str_contains(file_get_contents($directory.'/vitest.config.mjs'), 'nexiaAppConfig'));
+    assert(str_contains(file_get_contents($directory.'/phpunit.xml'), 'vendor/autoload.php'));
+    assert(str_contains(file_get_contents($directory.'/composer.json'), '--fail-on-empty-test-suite'));
+    assert(! str_contains($workflow, 'nexia-cloud-os/core'));
+    assert(! str_contains($workflow, 'prepare-local-composer'));
     $instructions = file_get_contents($directory.'/AGENTS.md');
     assert(str_contains($instructions, '# leave App'));
     assert(str_contains($instructions, 'docs/README.md'));
@@ -332,6 +344,13 @@ try {
     assert($snapshot($directory) === $before);
     $run([...$sourceArgs, "--label-key=leave.bad'key", '--write', '--force'], false);
     $run(['validate', 'acme/leave']);
+    $surfaceProbe = $directory.'/resources/js/RawIdentifierSurface.tsx';
+    file_put_contents($surfaceProbe, 'const label = item.name ?? item.public_id;');
+    assert(str_contains($run(['validate', 'acme/leave']), 'record-identifier-as-label'));
+    unlink($surfaceProbe);
+    symlink($directory.'/resources/js/index.ts', $surfaceProbe);
+    assert(str_contains($run(['validate', 'acme/leave'], false), 'Surface checks reject symlinks'));
+    unlink($surfaceProbe);
     $localeFile = $directory.'/resources/lang/en.json';
     $localeBefore = file_get_contents($localeFile);
     $locale = json_decode($localeBefore, true, flags: JSON_THROW_ON_ERROR);

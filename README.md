@@ -73,7 +73,7 @@ New Laravel Apps declare identity, Core compatibility and test paths in
 `nexia.json` (schema_version "2", runtime "laravel"). Composer owns PHP
 dependencies/autoload, while package.json owns frontend dependencies/build.
 Resource generation and validation read the same declaration; do not duplicate
-its fields under Composer extra.nexia. Existing legacy packages remain readable.
+its fields under Composer extra.nexia. Keep App metadata in the canonical manifest.
 
 Resource screens use ListSurface and a RecordSurface with explicit SDK modes.
 Read content uses text/badges; editable content uses composed public form inputs,
@@ -113,3 +113,17 @@ Resource generation creates the PHP/React application screens by default. Add `-
 ## Public CLI input
 
 Use `nexia create app`, `nexia make resource` and `nexia make page`. The Node CLI collects missing settings, validates supplied options and confirms the plan, then invokes this independently installed PHP generator with `--no-interaction`. PHP command signatures and standalone generator features remain available to their existing callers; they are not compatibility aliases in the public CLI. Translation, ownership and generated runtime contracts are unchanged.
+
+Generated Apps include independent PHP manifest and frontend landing tests.
+After dependency installation, `nexia test`/`composer test` and
+`nexia test --frontend`/`npm test` run without Core or sandbox login.
+Resource generation adds a public authorization contract test; App persistence
+and host integration behavior still require explicit App-owned tests.
+
+`nexia check` also scans the selected App's frontend surface standards: hub-only
+destinations, empty overviews, shared collection destinations, create forms
+inside lists, handwritten collection layouts and record identifiers used as
+labels. Explicit empty-state overviews and declared management workspaces keep
+their existing exceptions. Surface findings are warnings and do not turn an otherwise valid App into a
+failed metadata check. Invalid source boundaries, such as symlinks, still fail.
+This static check never loads Core or App PHP.

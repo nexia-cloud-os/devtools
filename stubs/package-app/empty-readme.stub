@@ -89,3 +89,20 @@ Before submission, commit/push source and a version tag with Git. Run
 Repository connection is requested in Developers when needed. Submission is not
 publication or installation. For App database work use `nexia db migrate`,
 `nexia db seed`, and `nexia db status`; queued does not mean completed.
+
+## Independent tests
+
+After installing dependencies, run `nexia test` (or `composer test`) and
+`nexia test --frontend` (or `npm test`). Neither command needs a Core checkout,
+login or a running sandbox. New Apps include a manifest/declaration test and
+a landing-surface test; `make resource` adds its public authorization-contract
+test to the same PHP suite. Vitest selects every App `*.test.ts`/`*.test.tsx`
+under `resources/js` and uses its own setup without the remote-host build plugin.
+
+Extend these with actual App behavior and explicit public SDK inputs. The
+landing test substitutes only host framing; it does not verify host layout or
+authorization enforcement. Persistence tests need App-owned migrations and
+SDK bindings; `nexia test --database` provides a disposable PostgreSQL service
+through `NEXIA_TEST_DB_HOST`, `NEXIA_TEST_DB_PORT` and the standard Laravel
+`DB_*` environment variables when such a harness is added.
+CI runs PHP tests, frontend tests and the standalone build.

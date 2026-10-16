@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { AppRouteFrame } from "@nexia/sdk/host";
+import { AppRouteFrame, NxEmptyView } from "@nexia/sdk/host";
 
 /** Neutral landing page; published navigation owns the available pages. */
 export default function {{ appPrefix }}OverviewSurface() {
@@ -11,7 +11,7 @@ export default function {{ appPrefix }}OverviewSurface() {
             title={t("{{ appKey }}.overview.title")}
             subtitle={t("{{ appKey }}.overview.subtitle")}
         >
-            <p>{t("{{ appKey }}.overview.empty.description")}</p>
+            <NxEmptyView kind="empty" title={t("{{ appKey }}.overview.empty.description")} />
         </AppRouteFrame>
     );
 }

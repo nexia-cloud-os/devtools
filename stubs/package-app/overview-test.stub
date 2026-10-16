@@ -1,0 +1,23 @@
+import type { ReactNode } from 'react';
+import { render, screen } from '@testing-library/react';
+import { expect, it, vi } from 'vitest';
+import messages from '../../lang/en.json';
+import {{ appPrefix }}OverviewSurface from './{{ appPrefix }}OverviewSurface';
+
+vi.mock('react-i18next', () => ({
+    useTranslation: () => ({ t: (key: string) => messages[key as keyof typeof messages] ?? key }),
+}));
+// Only host framing is substituted; the App surface and its catalog stay real.
+vi.mock('@nexia/sdk/host', () => ({
+    NxEmptyView: ({ title }: { title: string }) => <p>{title}</p>,
+    AppRouteFrame: ({ appKey, title, subtitle, children }: {
+        appKey: string; title: string; subtitle: string; children: ReactNode;
+    }) => <main data-app-key={appKey}><h1>{title}</h1><p>{subtitle}</p>{children}</main>,
+}));
+
+it('renders its own landing content inside the declared App frame', () => {
+    render(<{{ appPrefix }}OverviewSurface />);
+    expect(screen.getByRole('main')).toHaveAttribute('data-app-key', '{{ appKey }}');
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(messages['{{ appKey }}.overview.title']);
+    expect(screen.getByText(messages['{{ appKey }}.overview.empty.description'])).toBeVisible();
+});

@@ -10,7 +10,7 @@
         "pestphp/pest": "^4.4"
     },
     "scripts": {
-        "test": "pest --compact"
+        "test": "pest --compact --fail-on-empty-test-suite"
     },
     "config": {
         "allow-plugins": {

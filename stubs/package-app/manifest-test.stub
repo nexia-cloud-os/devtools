@@ -1,0 +1,19 @@
+<?php
+
+declare(strict_types=1);
+
+use Nexia\AppRuntime\AppPackageMetadataReader;
+use {{ packageNamespace }}\{{ appName }}AppManifest;
+
+test('App declaration and manifest agree on identity and landing page', function (): void {
+    $root = dirname(__DIR__, 2);
+    $definition = (new AppPackageMetadataReader)->read($root);
+    $manifest = new {{ appName }}AppManifest($definition);
+
+    expect($manifest->id())->toBe('{{ appKey }}')
+        ->and($definition->manifestClass)->toBe({{ appName }}AppManifest::class)
+        ->and($manifest->pageElementsExtras())->toHaveKey('/apps/{{ appKey }}', '{{ appPrefix }}OverviewSurface');
+    foreach ($manifest->tenantMigrationPaths() as $path) {
+        expect(is_dir($path))->toBeTrue();
+    }
+});

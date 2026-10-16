@@ -7,6 +7,7 @@ namespace Nexia\Devtools\Commands;
 use Illuminate\Console\Command;
 use Nexia\AppRuntime\AppPackageMetadataReader;
 use Nexia\Devtools\Commands\Concerns\WritesFlatTranslationCatalogs;
+use Nexia\Devtools\Validation\AppSurfaceStandardScanner;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use RuntimeException;
@@ -109,6 +110,10 @@ final class ValidateApp extends Command
                         ));
                     }
                 }
+            }
+            $surfaceViolations = (new AppSurfaceStandardScanner($root, $definition->appKey))->scan();
+            foreach ($surfaceViolations as $violation) {
+                $this->warn($violation['file'].': '.$violation['rule'].' — '.$violation['detail']);
             }
             $this->info("{$definition->appKey}: metadata and ".count($checked).' PHP source files are valid.');
             $this->line(count($catalogs).' flat translation catalogs are valid.');

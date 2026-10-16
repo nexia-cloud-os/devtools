@@ -34,7 +34,7 @@ here. This file belongs to the App developer after generation.
 ## Validation and delivery
 
 - Use the checks documented in README.md. At validation time, start with
-  `nexia check`, then verify the changed behavior and permissions in the sandbox.
+  `nexia check`, `nexia test`, and `nexia test --frontend`, then verify the changed behavior and permissions in the sandbox.
   Report source checks, observed runtime behavior, and unverified items separately.
 - Draft changes defer automated checks until testing, verification, finalization,
   commit, push, or PR is requested. Run the smallest relevant check then.

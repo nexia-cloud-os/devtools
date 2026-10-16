@@ -1,0 +1,16 @@
+import { fileURLToPath } from 'node:url';
+import { defineConfig } from 'vitest/config';
+
+// Build plugins bind a remote host; tests declare their public SDK inputs instead.
+export default defineConfig({
+    resolve: { alias: {
+        '#app': fileURLToPath(new URL('./resources/js', import.meta.url)),
+        '#lang': fileURLToPath(new URL('./resources/lang', import.meta.url)),
+    } },
+    esbuild: { jsx: 'automatic' },
+    test: {
+        environment: 'jsdom',
+        setupFiles: ['./tests/frontend/setup.ts'],
+        include: ['resources/js/**/*.test.{ts,tsx}'],
+    },
+});
