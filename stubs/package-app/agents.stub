@@ -33,6 +33,12 @@ here. This file belongs to the App developer after generation.
 
 ## Validation and delivery
 
+- Resolve cross-App list references once per resource and context for the
+  authorized page with `ResourceReferences::resolveMany()`. Deduplicate IDs,
+  let the SDK split remote batches of at most 100, and map returned IDs to rows. Keep actor,
+  organization, effective date and purpose boundaries; do not retry omitted IDs.
+  See the official API and authorization guide for the complete example.
+
 - Use the checks documented in README.md. At validation time, start with
   `nexia check`, `nexia test`, and `nexia test --frontend`, then verify the changed behavior and permissions in the sandbox.
   Report source checks, observed runtime behavior, and unverified items separately.
