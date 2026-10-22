@@ -1,9 +1,9 @@
 FROM node:22-bookworm-slim AS node
 RUN npm install --global --ignore-scripts --no-audit --no-fund npm@11.6.2
 FROM composer:2 AS composer
-FROM php:8.4-cli-bookworm
+FROM php:8.5.12-cli-bookworm@sha256:d4f6e10eb393de7e3a7a88e8b88e139072dd3ae297f6a5dada8257e6fe32c585
 RUN apt-get update && apt-get install -y --no-install-recommends git unzip libpq-dev libonig-dev libxml2-dev \
-    && docker-php-ext-install pdo_pgsql mbstring dom exif \
+    && docker-php-ext-install pdo_pgsql exif \
     && rm -rf /var/lib/apt/lists/*
 COPY --from=node /usr/local/bin/node /usr/local/bin/node
 COPY --from=node /usr/local/lib/node_modules /usr/local/lib/node_modules
