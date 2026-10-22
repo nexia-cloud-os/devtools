@@ -117,7 +117,7 @@ final class ValidateApp extends Command
             }
             $this->info("{$definition->appKey}: metadata and ".count($checked).' PHP source files are valid.');
             $this->line(count($catalogs).' flat translation catalogs are valid.');
-            $this->line('Local source checks only. Dependencies, permissions, migrations and remote runtime behavior require platform validation.');
+            $this->line('Local source checks only; App PHP was not executed. Dynamic querySchema/fieldSchema catalogs require isolated validation through nexia dev or an SDK catalog policy test. Dependencies, permissions, migrations and remote runtime behavior require platform validation.');
 
             return self::SUCCESS;
         } catch (Throwable $exception) {
