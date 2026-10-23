@@ -13,3 +13,7 @@ Generated Apps require Laravel/React SDK ^0.8.0 and Core ^0.7.0. They declare na
 Page/Resource generation retains explicit read/create/edit modes, shared guarded draft binding, lazy resource registrations and fail-closed error handling. Regeneration preserves migrations; source validation rejects symlinked inputs and invalid insertion markers before writes. The public CLI owns generation and standalone frontend watching.
 
 Use this separately published PHP development package with CLI 0.1.0-alpha.7. It is not a runtime Core dependency. Review the generated changes and verify the App before release.
+
+## Usage
+
+- [Create an App Package](https://developers.nexia.to/docs/building-apps-create-an-app)

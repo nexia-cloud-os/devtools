@@ -7,3 +7,9 @@ description: Generated entries reuse one resource contract map while keeping scr
 ---
 
 Resource generation and new App scaffolds share one eager resource contract map between Inspector and surface registration. Screen modules remain lazy. Regeneration upgrades the recognized older generated registrations while preserving custom entries. Existing Apps can regenerate their entry with this Devtools version; no runtime SDK API change is required.
+
+## Usage
+
+- [Nexia CLI](https://developers.nexia.to/docs/getting-started-cli)
+- [Create a Resource](https://developers.nexia.to/docs/building-apps-create-a-resource)
+- [Public CLI documentation](https://github.com/nexia-cloud-os/cli/blob/main/README.md)

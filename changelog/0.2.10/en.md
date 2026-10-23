@@ -7,3 +7,8 @@ description: Standalone App validation and test scaffolds
 ---
 
 App generation includes standalone PHP and frontend test fixtures. Empty PHP suites fail explicitly. Validation checks App surface conventions without executing App code. Existing App source is not rewritten. Generated Apps continue to require PHP SDK `^0.9.0`; these tools do not require the removed host testing contracts or force PHP SDK 0.10 adoption.
+
+## Usage
+
+- [Release an App](https://developers.nexia.to/docs/building-apps-release-an-app)
+- [Test an App](https://developers.nexia.to/docs/building-apps-test-an-app)

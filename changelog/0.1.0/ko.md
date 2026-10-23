@@ -31,3 +31,7 @@ description: Core 설치 없이 앱 소스를 생성하고 검증합니다.
 - 생성된 앱 안내를 공개 CLI의 `make:*` 명령과 로그인·등록·작업 탭 저장 확인 순서로 맞췄습니다. 의존성 설치 후에는 대응하는 CLI의 `nexia dev`가 로컬·Docker에서 Vite 빌드 감시까지 시작하므로 별도 빌드 터미널이 필요하지 않습니다.
 
 - 생성 앱에 `nexia-php84-v1` 플랫폼 계약을 선언하고 PHP SDK `^0.7.2`과 Core `^0.6.21`을 요구합니다. 대응하는 Core·격리 런타임 어댑터가 필요하며 SDK 설치만으로 호스트 기능이 활성화되지는 않습니다. 기존 앱 식별자는 변경하지 않습니다.
+
+## 사용 방법
+
+- [App 패키지 만들기](https://developers.nexia.to/ko/docs/building-apps-create-an-app)

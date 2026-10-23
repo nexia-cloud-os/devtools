@@ -11,3 +11,8 @@ description: 원격 실행 전에 흔한 사용자 계약 오류를 확인합니
 생성되는 앱 지침에 공개 SDK·권한 문서 링크와 사용자 식별, 리소스 범위, 저장 결과 갱신, 불확실한 저장의 복구 절차를 추가했습니다. 기존 앱 지침은 덮어쓰지 않습니다.
 
 `nexia setup --devtools`로 개발 도구를 갱신하고 앱에서 `nexia check`를 실행하세요. 기존 AGENTS.md에는 프로젝트 규칙을 보존하면서 관련 지침을 반영하세요. 런타임 SDK 의존성은 변경하지 않으며 권한과 실제 저장은 샌드박스에서 확인해야 합니다.
+
+## 사용 방법
+
+- [App 릴리스하기](https://developers.nexia.to/ko/docs/building-apps-release-an-app)
+- [SDK 사용 시작하기](https://developers.nexia.to/ko/docs/app-sdk-overview)

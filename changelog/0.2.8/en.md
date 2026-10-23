@@ -9,3 +9,7 @@ description: New App instructions link to the shared development guide.
 ## New App instructions
 
 - Newly generated App instructions focus on App-owned guidance and link to the official development guide for shared SDK contracts and checks. The guide can also be read with a CLI that supports `nexia docs`. Existing AGENTS.md files remain developer-owned and are not updated or replaced.
+
+## Usage
+
+- [Quickstart](https://developers.nexia.to/docs/getting-started-quickstart)

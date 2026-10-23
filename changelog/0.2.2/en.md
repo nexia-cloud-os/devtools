@@ -11,3 +11,8 @@ Local validation now rejects direct `$request->user()->getKey()` and `auth()->us
 Generated App instructions link the public SDK and permission guides and explain actor identity, Resource scope, saved-result refresh and uncertain-write recovery. Existing App instructions are not overwritten.
 
 Run `nexia setup --devtools` to update the development tools, then `nexia check` in your App. Merge relevant guidance into existing AGENTS.md files while preserving project rules. Runtime SDK dependencies are unchanged; verify permission and persistence behavior in the sandbox.
+
+## Usage
+
+- [Release an App](https://developers.nexia.to/docs/building-apps-release-an-app)
+- [Start using the SDK](https://developers.nexia.to/docs/app-sdk-overview)

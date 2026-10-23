@@ -32,3 +32,7 @@ description: Generate and validate App source without installing Core.
 - Generated App instructions use the public CLI `make:*` commands and the login, registration and work-tab save verification flow. After dependency installation, the matching CLI's `nexia dev` also watches frontend builds without another terminal.
 
 - Generated Apps declare the `nexia-php84-v1` platform contracts and require PHP SDK `^0.7.2` with Core `^0.6.21`. Use the matching Core and isolated runtime adapters; SDK installation alone does not enable these host capabilities. Existing App identities are unchanged.
+
+## Usage
+
+- [Create an App Package](https://developers.nexia.to/docs/building-apps-create-an-app)

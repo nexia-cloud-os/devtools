@@ -13,3 +13,7 @@ description: Core 0.7.0과 SDK 0.8.0용 네이티브 앱 생성.
 페이지·Resource 생성은 명시적인 조회·생성·수정 모드, 공통 초안 보호, 지연 Resource 등록, 오류 시 접근 차단을 유지합니다. 재생성은 마이그레이션을 보존하며 쓰기 전에 심볼릭 링크 입력과 잘못된 삽입 마커를 거부합니다. 생성과 독립 프런트엔드 감시는 공개 CLI가 담당합니다.
 
 별도로 게시되는 이 PHP 개발 패키지를 CLI 0.1.0-alpha.7과 함께 사용합니다. Core 런타임 의존성은 아닙니다. 생성된 변경을 검토하고 앱을 검증한 뒤 릴리스하세요.
+
+## 사용 방법
+
+- [App 패키지 만들기](https://developers.nexia.to/ko/docs/building-apps-create-an-app)

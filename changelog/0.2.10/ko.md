@@ -7,3 +7,8 @@ description: 독립 앱 검증과 테스트 템플릿
 ---
 
 앱 생성 시 독립적인 PHP·프런트엔드 테스트 fixture를 포함하며 빈 PHP 테스트는 실패로 처리합니다. 검증은 앱 코드를 실행하지 않고 화면 작성 규칙을 확인합니다. 기존 앱 소스를 다시 쓰지 않습니다. 생성 앱의 PHP SDK 요구 범위는 `^0.9.0`을 유지하며 제거된 호스트 테스트 계약이나 PHP SDK 0.10 채택을 요구하지 않습니다.
+
+## 사용 방법
+
+- [App 릴리스하기](https://developers.nexia.to/ko/docs/building-apps-release-an-app)
+- [App 테스트하기](https://developers.nexia.to/ko/docs/building-apps-test-an-app)
