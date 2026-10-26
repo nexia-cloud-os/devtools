@@ -38,6 +38,16 @@ here. This file belongs to the App developer after generation.
   let the SDK split remote batches of at most 100, and map returned IDs to rows. Keep actor,
   organization, effective date and purpose boundaries; do not retry omitted IDs.
   See the official API and authorization guide for the complete example.
+- For bounded multi-date/filter reads, use optional `GroupedResourceReferences`
+  and preserve a `resolveMany()` fallback for implementations without it.
+  Owners may implement `ResourceReferenceGroupedResolutionContribution` only
+  with a compatible SDK and host/runtime. Batch local evidence within the
+  invocation; preserve each date boundary, assignment and live authorization.
+  The transport limits each request to 31 groups / 400 selectors / 100 IDs per
+  group fragment. Bound application lookahead as well. Grouped HTTP alone does
+  not eliminate owner SQL loops: test call counts and SQL budgets at realistic
+  row/date/unit cardinalities, then verify elapsed time in the real workflow.
+  See the SDK Laravel README's grouped resolution example and compatibility rules.
 
 - Use the checks documented in README.md. At validation time, start with
   `nexia check`, `nexia test`, and `nexia test --frontend`, then verify the changed behavior and permissions in the sandbox.
