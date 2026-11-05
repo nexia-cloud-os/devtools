@@ -28,6 +28,9 @@ try {
     assert(! file_exists($root.'/acme'));
     $run(['make:app', 'LeaveManager', '--vendor=acme', '--family=people', '--key=leave', '--table-prefix=leave_records']);
     $directory = $root.'/acme/leave';
+    $defaultDashboard = file_get_contents($directory.'/src/Contribution/LeaveManagerDefaultDashboard.php');
+    assert(str_contains($defaultDashboard, 'implements DashboardDefaultContribution'));
+    assert(str_contains($defaultDashboard, 'return [];'));
     $workflow = file_get_contents($directory.'/.github/workflows/ci.yml');
     assert(str_contains($workflow, 'run: composer test'));
     assert(str_contains($workflow, 'run: npm run build'));
@@ -43,6 +46,7 @@ try {
     $instructions = file_get_contents($directory.'/AGENTS.md');
     assert(str_contains($instructions, '# leave App'));
     assert(str_contains($instructions, 'docs/README.md'));
+    assert(str_contains($instructions, 'https://developers.nexia.to/docs/building-apps-localize-an-app'));
     assert(str_contains($instructions, 'nexia docs search "topic"'));
     assert(str_contains($instructions, 'https://developers.nexia.to/docs/getting-started-agent-assisted-development'));
     assert(! str_contains($instructions, 'NxOrganizationTargetSelector'));
@@ -55,7 +59,7 @@ try {
     assert(str_contains($workflow, "php-version: '8.5.12'"));
     assert(str_contains(file_get_contents($directory.'/Dockerfile'), 'FROM php:8.5.12-cli-bookworm@sha256:'));
     assert(! str_contains(file_get_contents($directory.'/Dockerfile'), 'pdo_pgsql mbstring dom'));
-    assert($composer['require']['nexia-cloud-os/sdk-laravel'] === '^0.10.5');
+    assert($composer['require']['nexia-cloud-os/sdk-laravel'] === '^0.10.22');
     assert(str_contains(file_get_contents($directory.'/Dockerfile'), 'nexia-cloud-os/devtools:'));
     assert(! isset($composer['require']['nexia/sdk-laravel']));
     assert($composer['autoload']['psr-4'] === ['Nexia\\Apps\\Acme\\LeaveManager\\' => 'src/']);

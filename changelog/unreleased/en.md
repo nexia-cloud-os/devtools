@@ -36,3 +36,7 @@ status: draft
 ## Catalog translation validation
 
 - Translation values support up to 2,000 Unicode characters, including descriptions. Use matching SDK/devtools and Core versions; local `nexia check` reports the affected file, key and lengths.
+
+## Editable App overview
+
+New Apps declare an empty editable overview dashboard and require a PHP SDK that provides the dashboard contract. Use a matching Core and App runtime. See the [dashboard guide](https://developers.nexia.to/docs/platform-extensions-add-dashboard-widget) and [generator source](https://github.com/nexia-cloud-os/devtools/blob/main/src/Commands/MakePackageApp.php).

@@ -36,3 +36,7 @@ status: draft
 ## 카탈로그 번역 검증
 
 - 설명문을 포함한 번역 값을 유니코드 문자 2,000자까지 지원합니다. 대응하는 SDK/devtools와 Core 버전을 사용하세요. 로컬 `nexia check`에서 파일·키·길이를 확인할 수 있습니다.
+
+## 편집 가능한 앱 개요
+
+새 앱은 편집 가능한 빈 개요 대시보드를 선언하고 해당 계약을 제공하는 PHP SDK를 요구합니다. 대응하는 Core와 앱 런타임을 함께 사용하세요. [대시보드 안내](https://developers.nexia.to/ko/docs/platform-extensions-add-dashboard-widget)와 [생성기 소스](https://github.com/nexia-cloud-os/devtools/blob/main/src/Commands/MakePackageApp.php)를 참고하세요.

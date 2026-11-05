@@ -1,0 +1,16 @@
+<?php
+
+declare(strict_types=1);
+
+namespace {{ packageNamespace }}\Contribution;
+
+use Nexia\Dashboard\Contracts\DashboardDefaultContribution;
+
+/** Declares an initially empty, editable App overview dashboard. */
+final class {{ appName }}DefaultDashboard implements DashboardDefaultContribution
+{
+    public static function dashboardDefaultWidgetKeys(): array
+    {
+        return [];
+    }
+}

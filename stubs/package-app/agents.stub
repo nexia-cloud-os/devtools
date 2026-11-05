@@ -22,6 +22,9 @@ here. This file belongs to the App developer after generation.
 
 ## Translation catalogs
 
+- In host-rendered React screens, reuse the host's `common.*` keys for shared
+  interface messages when supported by the target Core version. Keep
+  App-owned declaration labels and domain wording in the App catalogs.
 - Keep `resources/lang/<locale>.json` flat with string values. Each value may
   contain at most 2,000 Unicode characters, including descriptions. Use
   `nexia check` at validation time to locate the file, key and length violations.

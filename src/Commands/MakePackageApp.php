@@ -237,6 +237,7 @@ class MakePackageApp extends Command
             "{$stubDir}/app-schema.stub" => "{$packageDir}/src/Support/Schema.php",
             "{$stubDir}/service-provider.stub" => "{$packageDir}/src/{$appName}ServiceProvider.php",
             "{$stubDir}/descriptor-slot-widgets.stub" => "{$packageDir}/src/Descriptors/{$appName}SlotWidgets.php",
+            "{$stubDir}/default-dashboard.stub" => "{$packageDir}/src/Contribution/{$appName}DefaultDashboard.php",
             "{$stubDir}/empty-routes.stub" => "{$packageDir}/routes/routes.php",
             "{$stubDir}/empty-resources-js-index.stub" => "{$packageDir}/resources/js/index.ts",
             "{$stubDir}/empty-overview.stub" => "{$packageDir}/resources/js/overview/{$appPrefix}OverviewSurface.tsx",
