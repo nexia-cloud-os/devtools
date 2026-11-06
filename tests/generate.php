@@ -48,7 +48,10 @@ try {
     assert(str_contains($instructions, 'docs/README.md'));
     assert(str_contains($instructions, 'https://developers.nexia.to/docs/building-apps-localize-an-app'));
     assert(str_contains($instructions, 'nexia docs search "topic"'));
-    assert(str_contains($instructions, 'https://developers.nexia.to/docs/getting-started-agent-assisted-development'));
+    assert(str_contains($instructions, 'existing public `@nexia/sdk/host` components'));
+    assert(str_contains($instructions, 'https://developers.nexia.to/docs/building-apps-build-a-frontend-surface'));
+    assert(str_contains($instructions, 'https://developers.nexia.to/docs/platform-extensions-resource-references'));
+    assert(! str_contains($instructions, '31 groups / 400 selectors'));
     assert(! str_contains($instructions, 'NxOrganizationTargetSelector'));
     file_put_contents($directory.'/AGENTS.md', "Developer-owned App rules\n");
     $run(['make:app', 'LeaveManager', '--key=leave', '--directory=acme/leave', '--repository-files-only']);

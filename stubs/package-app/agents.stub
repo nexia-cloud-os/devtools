@@ -1,61 +1,48 @@
 # {{ appKey }} App
 
-## Start here
+## Start with this App
 
-- Read `nexia.json`, `composer.json`, `package.json`, `README.md`, and
-  `docs/README.md` for this App's identity, commands, and domain design.
-- Before changing platform calls, read the official App development guide:
-  https://developers.nexia.to/docs/getting-started-agent-assisted-development
-  With a CLI that supports documentation commands, use `nexia docs`,
-  `nexia docs search "topic"`, and `nexia docs read <document-id>`.
-  The guide links to public SDK contracts, examples, and validation procedures.
-- Work in this App repository using public SDK contracts. Preserve its identity,
-  existing work, migrations, and data. Missing platform capabilities belong in
-  a support report, not a copied or patched platform implementation.
+- Read `nexia.json`, `README.md`, `docs/README.md`, and relevant App-owned docs
+  for identity, commands, and domain rules. Inspect the affected source and
+  callers before editing; preserve existing work, migrations, and data.
+- Work only in this App using installed public SDK contracts. Do not import,
+  copy, or patch Core, another App, or installed dependencies. Report a missing
+  public capability through developer support without exposing credentials or data.
+- Check the installed SDK versions and target host compatibility before using a
+  contract. Read only the relevant guides below; use `nexia docs search "topic"`
+  and `nexia docs read <document-id>` or the linked website when needed.
 
-## App-owned guidance
+## Choose guidance for the task
 
-Maintain this file with this App's responsibilities, domain constraints,
-implementation conventions, and focused checks as they are established.
-Keep shared Nexia guidance in the official documentation instead of copying it
-here. This file belongs to the App developer after generation.
+| Task | Read before implementation |
+| --- | --- |
+| Frontend screens and CSS | https://developers.nexia.to/docs/building-apps-build-a-frontend-surface and https://developers.nexia.to/docs/app-sdk-frontend-host-contracts and see https://developers.nexia.to/examples |
+| Resource, data model and migration | https://developers.nexia.to/docs/building-apps-create-a-resource and https://developers.nexia.to/docs/building-apps-data-model-and-migrations |
+| API, actor and authorization | https://developers.nexia.to/docs/building-apps-add-api-and-authorization |
+| Cross-App data and batching | https://developers.nexia.to/docs/platform-extensions-resource-references |
+| Events and background work | https://developers.nexia.to/docs/building-apps-handle-events-and-async-work |
+| Translation catalogs | https://developers.nexia.to/docs/building-apps-localize-an-app |
+| Testing and release | https://developers.nexia.to/docs/building-apps-test-an-app and https://developers.nexia.to/docs/building-apps-release-an-app |
 
-## Translation catalogs
+For frontend work, prefer existing public `@nexia/sdk/host` components and
+patterns whenever they meet the need. Use their supported props and slots;
+scope custom styles to App-owned markup instead of overriding host internals.
+For cross-App list references, batch unique IDs for the authorized page and
+preserve actor, organization, date, and purpose boundaries. Follow the guide's
+compatibility and fallback rules; do not retry omitted IDs as an access bypass.
+For translations, reuse supported host `common.*` keys for shared UI and keep
+App-owned domain wording in flat App catalogs. Fix validation errors before
+retrying; never delete `.nexia` or reset data to bypass recovery status.
 
-- In host-rendered React screens, reuse the host's `common.*` keys for shared
-  interface messages when supported by the target Core version. Keep
-  App-owned declaration labels and domain wording in the App catalogs.
-- Keep `resources/lang/<locale>.json` flat with string values. Each value may
-  contain at most 2,000 Unicode characters, including descriptions. Use
-  `nexia check` at validation time to locate the file, key and length violations.
-- The exported runtime catalog is limited to 1 MiB, 20 locales and 1,000 exported
-  keys per locale. See the official localization guide for the shared contract:
-  https://developers.nexia.to/docs/building-apps-localize-an-app
-- Fix `CATALOG_VALIDATION_FAILED` declarations before retrying. Follow the
-  operation's retry/review status; never delete `.nexia` or reset data to bypass it.
+## App-owned guidance and delivery
 
-## Validation and delivery
+Maintain this file with the App's domain constraints, conventions, and focused
+checks. Keep shared platform details in the linked guides. Existing App files
+and instructions belong to their developer and are not replaced by tool updates.
 
-- Resolve cross-App list references once per resource and context for the
-  authorized page with `ResourceReferences::resolveMany()`. Deduplicate IDs,
-  let the SDK split remote batches of at most 100, and map returned IDs to rows. Keep actor,
-  organization, effective date and purpose boundaries; do not retry omitted IDs.
-  See the official API and authorization guide for the complete example.
-- For bounded multi-date/filter reads, use optional `GroupedResourceReferences`
-  and preserve a `resolveMany()` fallback for implementations without it.
-  Owners may implement `ResourceReferenceGroupedResolutionContribution` only
-  with a compatible SDK and host/runtime. Batch local evidence within the
-  invocation; preserve each date boundary, assignment and live authorization.
-  The transport limits each request to 31 groups / 400 selectors / 100 IDs per
-  group fragment. Bound application lookahead as well. Grouped HTTP alone does
-  not eliminate owner SQL loops: test call counts and SQL budgets at realistic
-  row/date/unit cardinalities, then verify elapsed time in the real workflow.
-  See the SDK Laravel README's grouped resolution example and compatibility rules.
-
-- Use the checks documented in README.md. At validation time, start with
-  `nexia check`, `nexia test`, and `nexia test --frontend`, then verify the changed behavior and permissions in the sandbox.
-  Report source checks, observed runtime behavior, and unverified items separately.
-- Draft changes defer automated checks until testing, verification, finalization,
-  commit, push, or PR is requested. Run the smallest relevant check then.
-- Use a purpose-named branch. Do not commit, push, submit, merge, publish,
-  reset data, or send messages without authorization. Never expose credentials.
+Use the checks in README.md. At validation, start with relevant `nexia check`,
+`nexia test`, or `nexia test --frontend`, then verify changed behavior and
+permissions in the sandbox. Report source checks and observed runtime behavior
+separately. Draft changes defer automated checks until testing, verification,
+finalization, commit, push, or PR is requested. Never commit, push, submit,
+merge, publish, reset data, or send messages without authorization.
