@@ -69,7 +69,7 @@ removes its own App and checks lazy chunks, dependency preloading and host peers
 CI runs this check for both React SDK and generator changes. It does not verify a
 browser host or published dependencies; measure business-data readiness separately.
 
-New Laravel Apps declare identity, Core compatibility and test paths in
+New Laravel Apps declare identity, platform contracts and test paths in
 `nexia.json` (schema_version "2", runtime "laravel"). Composer owns PHP
 dependencies/autoload, while package.json owns frontend dependencies/build.
 Resource generation and validation read the same declaration; do not duplicate

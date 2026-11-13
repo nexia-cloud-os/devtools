@@ -87,6 +87,7 @@ try {
 
     $declaration = json_decode(file_get_contents($directory.'/nexia.json'), true, flags: JSON_THROW_ON_ERROR);
     assert($declaration['schema_version'] === '2' && $declaration['runtime'] === 'laravel');
+    assert(! array_key_exists('core_version', $declaration));
     assert($declaration['app']['app_table_prefix'] === 'leave_records');
     assert(file_get_contents($directory.'/.dockerignore') === "**\n!Dockerfile\n");
     assert(str_contains(file_get_contents($directory.'/compose.yaml'), 'NEXIA_CONFIG_HOME: /nexia-config/'));
