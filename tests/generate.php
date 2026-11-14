@@ -46,6 +46,11 @@ try {
     $instructions = file_get_contents($directory.'/AGENTS.md');
     assert(str_contains($instructions, '# leave App'));
     assert(str_contains($instructions, 'docs/README.md'));
+    assert(str_contains($instructions, 'For new cross-App, Party, user and person-profile reads'));
+    assert(str_contains($instructions, '`ResourceReferenceQueries` for cross-App'));
+    assert(str_contains($instructions, '`IdentityQueries` for Party'));
+    assert(str_contains($instructions, 'Legacy'));
+    assert(str_contains($instructions, 'status`, `data`, `page`, and'));
     assert(str_contains($instructions, 'https://developers.nexia.to/docs/building-apps-localize-an-app'));
     assert(str_contains($instructions, 'nexia docs search "topic"'));
     assert(str_contains($instructions, 'existing public `@nexia/sdk/host` components'));

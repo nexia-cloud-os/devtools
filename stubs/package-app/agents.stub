@@ -2,9 +2,10 @@
 
 ## Start with this App
 
-- Read `nexia.json`, `README.md`, `docs/README.md`, and relevant App-owned docs
-  for identity, commands, and domain rules. Inspect the affected source and
-  callers before editing; preserve existing work, migrations, and data.
+- Read `nexia.json`, `composer.json`, `package.json`, `README.md`, `docs/README.md`,
+  and relevant App-owned docs for identity, commands, and domain rules. Inspect
+  the affected source and callers before editing; preserve existing work,
+  migrations, and data.
 - Work only in this App using installed public SDK contracts. Do not import,
   copy, or patch Core, another App, or installed dependencies. Report a missing
   public capability through developer support without exposing credentials or data.
@@ -27,12 +28,39 @@
 For frontend work, prefer existing public `@nexia/sdk/host` components and
 patterns whenever they meet the need. Use their supported props and slots;
 scope custom styles to App-owned markup instead of overriding host internals.
+For protected cross-App ID reads, use the existing `includeProtectedValues` context;
+the owner must authorize the purpose and scope. Never log protected values or
+retry without protection. Matching SDK, Core and runtime support is required.
+
 For cross-App list references, batch unique IDs for the authorized page and
 preserve actor, organization, date, and purpose boundaries. Follow the guide's
 compatibility and fallback rules; do not retry omitted IDs as an access bypass.
+For new cross-App, Party, user and person-profile reads, prefer the standard
+chainable APIs on supported hosts: use `ResourceReferenceQueries` for cross-App
+reads and `IdentityQueries` for Party, user and person-profile reads. See
+https://developers.nexia.to/docs/platform-extensions-resource-references for
+examples and supported conditions. A query executes at `get()`, and the result
+contains `status`, `data`, `page`, and `error`; check each status before using
+data. Prefer `queryBatch()` when independent queries can share a batch. Legacy
+lookup methods are deprecated where an equivalent standard query is available,
+but remain supported for the transition and older hosts. Preserve their return
+and failure handling when maintaining old code. Pagination and historical reads
+require provider support; never broaden authority to retry omitted IDs.
+Existing context filters may be ignored by legacy providers; if migration
+requires `allowLegacyContextFilters()`, never treat those filters as an
+authorization boundary. New builder conditions still require schema validation.
+For protected cross-App ID reads, use standard `query()` with an
+`includeProtectedValues` context; the owner must authorize the purpose and
+scope. Existing `resolve()`/`resolveMany()` also support this option on matching hosts.
+Never log protected values or retry without protection. Matching SDK, Core and
+runtime support is required.
 For translations, reuse supported host `common.*` keys for shared UI and keep
-App-owned domain wording in flat App catalogs. Fix validation errors before
-retrying; never delete `.nexia` or reset data to bypass recovery status.
+App-owned domain wording in flat `resources/lang/<locale>.json` catalogs. Each
+value may contain at most 2,000 Unicode characters, including descriptions.
+The exported runtime catalog is limited to 1 MiB, 20 locales and 1,000 exported
+keys per locale; use `nexia check` to locate translation violations. Fix
+validation errors, including `CATALOG_VALIDATION_FAILED`, before retrying;
+never delete `.nexia` or reset data to bypass recovery status.
 
 ## App-owned guidance and delivery
 
@@ -42,7 +70,8 @@ and instructions belong to their developer and are not replaced by tool updates.
 
 Use the checks in README.md. At validation, start with relevant `nexia check`,
 `nexia test`, or `nexia test --frontend`, then verify changed behavior and
-permissions in the sandbox. Report source checks and observed runtime behavior
-separately. Draft changes defer automated checks until testing, verification,
-finalization, commit, push, or PR is requested. Never commit, push, submit,
+permissions in the sandbox. Report source checks, observed runtime behavior and
+unverified items separately. Draft changes defer automated checks until testing,
+verification, finalization, commit, push, or PR is requested. Use a purpose-named
+branch. Never commit, push, submit,
 merge, publish, reset data, or send messages without authorization.
