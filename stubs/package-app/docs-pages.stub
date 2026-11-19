@@ -42,13 +42,16 @@ reference for the first three; do not invent a fifth kind.
 
 | Kind | Contract | Reference |
 | --- | --- | --- |
-| Overview | One per App. Four to eight `NxStatCard` figures that open the list they count, plus create actions. No table. | `/apps/people` |
+| Overview | One per App. Use the generated default dashboard and SDK report contracts; separate App overview screens are deprecated. | `/apps/people` |
 | Insights | `NxInsightSurface`: filter, then summary cards, then chart, then a chrome-free `ResourceTable`. An aggregate is not a browsable collection, so omit toolbar/footer and link to the owning list instead. | `/apps/people/insights/movements` |
 | Resource list / form / detail | The generated triad. The list is `NxPageFrame` + `WorkSurface` + `WorkSection layout="fullBleed"` + `ResourceTable`; create is its own `/new` route; record actions live in the row action menu. | `/apps/people/employment-categories` |
 | Config form | Owns exactly one record and edits its field set; it does not browse a collection. Optional parent selector plus a link to that parent's list, then `NxSectionCard` sections of `NxFieldset` / `NxFormField`. | `/apps/quality/settings/policies` |
 
-Each kind has one source. The Overview arrives with the App from
-`nexia-apps:make-package-app`. The Resource triad is emitted by
+The generated App declares an initially empty default dashboard. Add authorized
+reports and supported dashboard content as needed. The generated overview route
+and surface remain as a compatibility fallback; do not extend it into a new
+overview. Existing Apps may continue to use their separate overview during the
+transition. The Resource triad is emitted by
 `nexia-apps:make-package-resource`: generate it, then edit what it produced — do not
 hand-write a list, form, or detail. A hand-rolled one silently drops what the
 generator wires for free, and the omissions are the same every time: field-level
@@ -74,15 +77,9 @@ Insights destinations hold the date range in the URL via
 Record any destination that genuinely has no shape worth drawing, and why, in
 the table below.
 
-Compose from domain signals, not by copying another App (full decision table:
-`docs/reference/APPS.md#developing-an-app` step 10). An attention band
-(`NxOverviewBand variant="attention"`) only when this App has states a person
-must clear — a `Failed`/`Blocked` status value, an `*_exception_reason`
-column, a failed-line counter, an overdue check, or capacity vs actuals; band
-headings only when cards span more than one of exceptions / scheduled work /
-context; a `delta` only when the API answers the same figure for a prior
-window. Record below which parts this App uses and the code signal that
-justified each:
+Compose from domain signals, not by copying another App. Add a `delta` only
+when the API answers the same figure for a prior window. Record below which
+parts this App uses and the code signal that justified each:
 
 | Part | Used | Signal |
 | --- | --- | --- |

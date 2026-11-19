@@ -31,6 +31,14 @@ try {
     $defaultDashboard = file_get_contents($directory.'/src/Contribution/LeaveManagerDefaultDashboard.php');
     assert(str_contains($defaultDashboard, 'implements DashboardDefaultContribution'));
     assert(str_contains($defaultDashboard, 'return [];'));
+    $overviewFallback = file_get_contents($directory.'/resources/js/overview/LeaveOverviewSurface.tsx');
+    assert(str_contains($overviewFallback, 'Compatibility fallback'));
+    assert(str_contains(file_get_contents($directory.'/resources/js/index.ts'), "overview: () => import('./overview/LeaveOverviewSurface')"));
+    assert(str_contains(file_get_contents($directory.'/tests/Unit/AppManifestTest.php'), 'LeaveManagerDefaultDashboard::dashboardDefaultWidgetKeys()'));
+    assert(str_contains(file_get_contents($directory.'/tests/Unit/AppManifestTest.php'), '->toBeArray()'));
+    $pages = file_get_contents($directory.'/docs/PAGES.md');
+    assert(str_contains($pages, 'separate App overview screens are deprecated'));
+    assert(! str_contains($pages, 'Four to eight `NxStatCard`'));
     $workflow = file_get_contents($directory.'/.github/workflows/ci.yml');
     assert(str_contains($workflow, 'run: composer test'));
     assert(str_contains($workflow, 'run: npm run build'));
@@ -54,6 +62,7 @@ try {
     assert(str_contains($instructions, 'https://developers.nexia.to/docs/building-apps-localize-an-app'));
     assert(str_contains($instructions, 'nexia docs search "topic"'));
     assert(str_contains($instructions, 'existing public `@nexia/sdk/host` components'));
+    assert(str_contains($instructions, 'Separate App overview screens are deprecated'));
     assert(str_contains($instructions, 'https://developers.nexia.to/docs/building-apps-build-a-frontend-surface'));
     assert(str_contains($instructions, 'https://developers.nexia.to/docs/platform-extensions-resource-references'));
     assert(! str_contains($instructions, '31 groups / 400 selectors'));

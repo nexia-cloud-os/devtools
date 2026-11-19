@@ -6,7 +6,7 @@ namespace {{ packageNamespace }}\Contribution;
 
 use Nexia\Dashboard\Contracts\DashboardDefaultContribution;
 
-/** Declares an initially empty, editable App overview dashboard. */
+/** Declares an initially empty, editable App overview dashboard for the host. */
 final class {{ appName }}DefaultDashboard implements DashboardDefaultContribution
 {
     public static function dashboardDefaultWidgetKeys(): array

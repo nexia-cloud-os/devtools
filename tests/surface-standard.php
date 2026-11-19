@@ -77,6 +77,9 @@ TSX);
         assert(count($violations) === 2);
         assert(array_map(static fn (array $violation): string => basename($violation['file']), $violations) === ['HostedCreateListSurface.tsx', 'MixedSurface.tsx']);
         assert(str_ends_with(array_values(array_filter($all, static fn (array $violation): bool => $violation['rule'] === 'record-identifier-as-label'))[0]['file'], 'RawLabelSurface.tsx'));
+        file_put_contents($js.'/overview/EmptyOverviewSurface.tsx', 'export default function OverviewSurface() { return <div />; }');
+        $fallbackViolations = (new AppSurfaceStandardScanner($root, 'example'))->scan();
+        assert(count(array_filter($fallbackViolations, static fn (array $violation): bool => $violation['rule'] === 'overview-without-figures')) === 0);
 
     } finally {
         $iterator = new RecursiveIteratorIterator(

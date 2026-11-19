@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Nexia\AppRuntime\AppPackageMetadataReader;
+use {{ packageNamespace }}\Contribution\{{ appName }}DefaultDashboard;
 use {{ packageNamespace }}\{{ appName }}AppManifest;
 
 test('App declaration and manifest agree on identity and landing page', function (): void {
@@ -12,7 +13,8 @@ test('App declaration and manifest agree on identity and landing page', function
 
     expect($manifest->id())->toBe('{{ appKey }}')
         ->and($definition->manifestClass)->toBe({{ appName }}AppManifest::class)
-        ->and($manifest->pageElementsExtras())->toHaveKey('/apps/{{ appKey }}', '{{ appPrefix }}OverviewSurface');
+        ->and($manifest->pageElementsExtras())->toHaveKey('/apps/{{ appKey }}', '{{ appPrefix }}OverviewSurface')
+        ->and({{ appName }}DefaultDashboard::dashboardDefaultWidgetKeys())->toBeArray();
     foreach ($manifest->tenantMigrationPaths() as $path) {
         expect(is_dir($path))->toBeTrue();
     }

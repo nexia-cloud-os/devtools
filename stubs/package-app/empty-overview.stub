@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { AppRouteFrame, NxEmptyView } from "@nexia/sdk/host";
 
-/** Neutral landing page; published navigation owns the available pages. */
+/** Compatibility fallback for hosts or routes that display the original overview. */
 export default function {{ appPrefix }}OverviewSurface() {
     const { t } = useTranslation();
 

@@ -18,6 +18,7 @@
 | Task | Read before implementation |
 | --- | --- |
 | Frontend screens and CSS | https://developers.nexia.to/docs/building-apps-build-a-frontend-surface and https://developers.nexia.to/docs/app-sdk-frontend-host-contracts and see https://developers.nexia.to/examples |
+| App overview and dashboard | https://developers.nexia.to/docs/platform-extensions-add-dashboard-widget |
 | Resource, data model and migration | https://developers.nexia.to/docs/building-apps-create-a-resource and https://developers.nexia.to/docs/building-apps-data-model-and-migrations |
 | API, actor and authorization | https://developers.nexia.to/docs/building-apps-add-api-and-authorization |
 | Cross-App data and batching | https://developers.nexia.to/docs/platform-extensions-resource-references |
@@ -28,6 +29,9 @@
 For frontend work, prefer existing public `@nexia/sdk/host` components and
 patterns whenever they meet the need. Use their supported props and slots;
 scope custom styles to App-owned markup instead of overriding host internals.
+Use the generated default dashboard and SDK report contracts for the App
+overview. Separate App overview screens are deprecated; keep the generated
+fallback route for existing hosts and do not add overview features to it.
 For protected cross-App ID reads, use the existing `includeProtectedValues` context;
 the owner must authorize the purpose and scope. Never log protected values or
 retry without protection. Matching SDK, Core and runtime support is required.

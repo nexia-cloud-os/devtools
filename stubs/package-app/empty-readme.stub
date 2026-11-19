@@ -32,6 +32,12 @@ permissions in Developers, save a record and reopen it to verify persistence.
 Registration grants no business access. `nexia make page ExamplePage` adds a page
 without creating a model or migration; implement its business query.
 
+The generated App declares an initially empty platform overview dashboard.
+Use SDK reports and supported dashboard content for the overview. A separate
+App overview screen is deprecated; keep the generated fallback route for
+existing hosts during the transition. See
+https://developers.nexia.to/docs/platform-extensions-add-dashboard-widget.
+
 ## Docker tools
 
 The generated Dockerfile and Compose service retain the App tooling environment.

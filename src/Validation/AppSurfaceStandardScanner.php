@@ -31,7 +31,6 @@ final class AppSurfaceStandardScanner
                 $this->insightsBrowsingCollections($app, $directory),
                 $this->insightsWithoutChart($app, $directory),
                 $this->settingsHubDestinations($app, $directory),
-                $this->overviewsWithoutFigures($app, $directory),
                 $this->sharedDestinationSurfaces($app, $directory),
                 $this->handRolledCollections($app, $directory),
                 $this->listsHostingCreateForms($app, $directory),
@@ -245,47 +244,6 @@ final class AppSurfaceStandardScanner
         }
 
         return $violations;
-    }
-
-    /**
-     * The Overview page kind carries figures that open a list. Without them the
-     * App root is either blank or a second copy of the App Menu.
-     *
-     * @return list<array{app: string, file: string, rule: string, detail: string}>
-     */
-    private function overviewsWithoutFigures(string $app, string $directory): array
-    {
-        $index = $directory.'/index.ts';
-        if (! is_file($index)) {
-            return [];
-        }
-        if (preg_match('/overview:\s*\(\)\s*=>\s*import\(\s*[\'"]([^\'"]+)[\'"]/', (string) file_get_contents($index), $match) !== 1) {
-            return [];
-        }
-
-        $entry = $this->resolveImport($directory, $match[1]);
-        if ($entry === null) {
-            return [];
-        }
-
-        $source = $this->expand($entry);
-        if ($this->rendersData($source) || $this->isExplicitlyEmptyOverview($source)) {
-            return [];
-        }
-
-        return [[
-            'app' => $app,
-            'file' => $this->relative($entry),
-            'rule' => 'overview-without-figures',
-            'detail' => 'the App Overview shows no figures (NxStatCard or NxOverviewBand); count the rows of the list each card opens',
-        ]];
-    }
-
-    /** A scaffolded App owns no resource yet, so its landing page is explicit emptiness. */
-    private function isExplicitlyEmptyOverview(string $source): bool
-    {
-        return str_contains($source, '<NxEmptyView')
-            && preg_match('/\bkind\s*=\s*["\']empty["\']/', $source) === 1;
     }
 
     /**
