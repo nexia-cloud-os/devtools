@@ -1,5 +1,4 @@
 import { useCallback, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
@@ -31,7 +30,7 @@ import {
     NxButton,
     NxPageFrame,
     NxEmptyView,
-    NxActionButton,
+    NxLinkButton,
     NxSearchField,
 } from '@nexia/sdk/host';
 import { NxOrganizationTargetSelector, useOrganizationTargetsQuery, useOrganizationListScope } from '@nexia/sdk/host';
@@ -55,7 +54,6 @@ export function prefetch(context: AppRoutePrefetchContext): void {
 
 export default function {{ ResourceName }}ListSurface() {
     const { t } = useTranslation();
-    const navigate = useNavigate();
     const [selectedId, setSelectedId] = useState<string | null>(null);
     const queryClient = useQueryClient();
 
@@ -243,9 +241,9 @@ export default function {{ ResourceName }}ListSurface() {
         });
     }
 
-    const createRecord = () => navigate(creatableLegalEntityPublicIds.length === 1
+    const createHref = creatableLegalEntityPublicIds.length === 1
         ? {{ resourceCamel }}CreateRoute() + `?legal_entity_public_id=${encodeURIComponent(creatableLegalEntityPublicIds[0]!)}`
-        : {{ resourceCamel }}CreateRoute());
+        : {{ resourceCamel }}CreateRoute();
     const selectRow = (row: {{ ResourceName }}Record) => {
         if (row.actions.view) setSelectedId({{ resourceCamel }}ResourceId(row));
     };
@@ -301,12 +299,9 @@ export default function {{ ResourceName }}ListSurface() {
             actions={
                 <>
                     {canCreate ? (
-                        <NxActionButton
-                            kind="create"
-                            label={labels.createButtonLabel}
-                            onClick={createRecord}
-                            data-testid="{{ resourceKebab }}-create"
-                        />
+                        <NxLinkButton variant="primary" href={createHref} data-testid="{{ resourceKebab }}-create">
+                            {labels.createButtonLabel}
+                        </NxLinkButton>
                     ) : null}
                 </>
             }
@@ -350,7 +345,7 @@ export default function {{ ResourceName }}ListSurface() {
                                 hasActiveQuery={Boolean(search.trim())}
                                 emptyState={{
                                     title: t('{{ resource_key }}.list.empty'),
-                                    action: canCreate ? <NxActionButton kind="create" label={labels.createButtonLabel} onClick={createRecord} /> : null,
+                                    action: canCreate ? <NxLinkButton variant="primary" href={createHref}>{labels.createButtonLabel}</NxLinkButton> : null,
                                     testId: '{{ resourceKebab }}-empty',
                                 }}
                                 rowTestId={(row) => `{{ resourceKebab }}-row-${{{ resourceCamel }}ResourceId(row)}`}

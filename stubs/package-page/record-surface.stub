@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { isHttpError } from '@nexia/sdk';
 import {
-    NxPageFrame, NxButton, NxEmptyView, NxLoadingBlock, NxFormSection, NxFormField,
+    NxPageFrame, NxButton, NxLinkButton, NxEmptyView, NxLoadingBlock, NxFormSection, NxFormField,
     NxTextInput, NxDetailRow, NxSectionCard, useContextQuery, useMarkTabDirty, parseMutationFormError, firstFieldError,
 } from '@nexia/sdk/host';
 import {
@@ -49,7 +49,6 @@ function Editor({ record, tenantId }: { record: {{ PageName }}Record; tenantId: 
 
 export default function {{ PageName }}RecordSurface({ mode = 'read' }: { mode?: 'read' | 'edit' }) {
     const { t } = useTranslation();
-    const navigate = useNavigate();
     const { id } = useParams<{ id: string }>();
     const { data: context } = useContextQuery();
     const tenantId = context?.tenant?.id;
@@ -65,7 +64,7 @@ export default function {{ PageName }}RecordSurface({ mode = 'read' }: { mode?: 
                 {mode === 'edit' ?
                 record.actions.update ? <Editor key={JSON.stringify([tenantId, id])} record={record} tenantId={tenantId!} /> : <NxEmptyView kind="permission" /> : <>
                     <NxSectionCard title={t('{{ appKey }}.pages.{{ pageKey }}.sections.basics')} layout="rows"
-                        actions={record.actions.update ? <NxButton onClick={() => navigate(`${{{ pageCamel }}RecordRoute(record.id)}/edit`)}>{t('common.actions.edit')}</NxButton> : undefined}>
+                        actions={record.actions.update ? <NxLinkButton variant="secondary" href={`${{{ pageCamel }}RecordRoute(record.id)}/edit`}>{t('common.actions.edit')}</NxLinkButton> : undefined}>
                         <NxDetailRow label={t('{{ appKey }}.pages.{{ pageKey }}.title')}>{record.title}</NxDetailRow>
                     </NxSectionCard>
                 </>}

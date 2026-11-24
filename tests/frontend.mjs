@@ -65,7 +65,7 @@ try {
     const host = {
         firstFieldError: () => undefined,
         api: {}, serializeResourceTableSort: () => '-name', NxButton: 'button', NxEmptyView: 'empty', NxLoadingBlock: 'loading',
-        NxPageFrame: 'frame', NxActionButton: 'action',
+        NxPageFrame: 'frame', NxActionButton: 'action', NxLinkButton: 'link-button',
         useContextQuery: () => ({ data: { tenant: { id: 'tenant' } } }),
         useWorkSurfaceLabels: () => ({ breadcrumbLabel: 'Note', tabLabel: 'Note' }),
         useWorkTabLabel: () => {},
@@ -177,7 +177,10 @@ try {
     assert.equal(refreshFailure.props.children[0].props.kind, 'error');
     assert.equal(refreshFailure.props.children[1].type, module.exports.RecordDetails);
     assert.equal(render({ data: retained, isError: true, error: { response: { status: 403 } } }).props.children.props.kind, 'permission');
-    render({ data: retained });
+    const readPage = render({ data: retained });
+    const editLink = readPage.props.actions.props.children.find(child => child?.type === host.NxLinkButton);
+    assert.equal(editLink?.props.href, '/notes/record/edit');
+    assert.equal(editLink?.props.variant, 'secondary');
     await assert.rejects(mutationOptions.mutationFn({ name: 'Forbidden read write' }), /not editable/);
     assert.throws(() => module.exports.default({}), /explicit SDK route mode/);
     assert.equal(render({ data: { note: { name: 'Read only', actions: { view: true, update: false } } } }, 'edit').props.children.props.kind, 'permission');

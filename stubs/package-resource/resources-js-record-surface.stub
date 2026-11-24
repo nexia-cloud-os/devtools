@@ -39,6 +39,7 @@ import {
     NxLoadingBlock,
     NxPageFrame,
     NxActionButton,
+    NxLinkButton,
     NxActions,
     useContextQuery,
     useWorkSurfaceLabels,
@@ -392,13 +393,9 @@ function RecordContent({
                     <NxActions resourceKey="{{ resourceKey }}" placement="resource" currentTargets={[{ id: resourceId, label: item.name }]} legalEntityPublicId={item.legal_entity_public_id} onSuccess={() => { void retryDetail(); void queryClient.invalidateQueries({ queryKey: ['{{ appKey }}-{{ resourcePluralKebab }}', tenantId ?? ''] }); }} />
                     {
                     item.actions.update ? (
-                        <NxActionButton
-                            kind="edit"
-                            label={t('common.actions.edit')}
-                            type="button"
-                            onClick={() => navigate({{ resourceCamel }}EditRoute(resourceId))}
-                            data-testid="{{ resourceKebab }}-edit"
-                        />
+                        <NxLinkButton variant="secondary" href={ {{ resourceCamel }}EditRoute(resourceId) } data-testid="{{ resourceKebab }}-edit">
+                            {t('common.actions.edit')}
+                        </NxLinkButton>
                     ) : null
                     }
                 </>}
